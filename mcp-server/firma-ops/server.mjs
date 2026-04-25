@@ -17,13 +17,17 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { TOOL_DEFINITIONS, makeHandlers } from "./handlers.mjs";
+import { httpContextFromEnv } from "./http-backend.mjs";
 
 const server = new Server(
   { name: "firma-ops", version: "0.1.0" },
   { capabilities: { tools: {} } }
 );
 
-const handlers = makeHandlers();
+// If FIRMA_OPS_BASE_URL is set, route handlers to the live haex-corp runtime;
+// otherwise fall back to in-process stubs (useful for development).
+const httpContext = httpContextFromEnv();
+const handlers = makeHandlers(httpContext ?? {});
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: TOOL_DEFINITIONS,
