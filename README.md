@@ -68,6 +68,11 @@ You are an experienced backend engineer focused on...
 - `finite` — goal-oriented (build a feature → done).
 - `continuous` — control-loop (e.g. trading firm: research → evaluate → deploy → monitor → report → repeat).
 
+## Documentation
+
+- [docs/INSTALL.md](docs/INSTALL.md) — production + local dev install, Hermes setup, firma-ops env config, troubleshooting.
+- [docs/concepts.md](docs/concepts.md) — spec hierarchy, operating modes, capability taxonomy, autonomy, worktree isolation, retirement.
+
 ## Requirements
 
 - Node.js 22+
