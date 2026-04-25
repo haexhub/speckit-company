@@ -99,6 +99,23 @@ When `mutates_filesystem: true`, the runtime creates `<repo>/.worktrees/<task-sl
 
 For research / read-only tasks, set `isolation: shared` to skip the worktree overhead.
 
+## Central tool, binary & skill catalog
+
+Three categories live in a single shared catalog at `<haex-corp>/catalog/`. Agents reference entries by ID:
+
+```yaml
+tools:
+  mcp: [github, firma-ops]              # → catalog/tools/{github,firma-ops}.yml
+  binaries: [python3, gh, jq]           # → catalog/binaries/{python3,gh,jq}.yml
+skills: [tdd, verification-before-completion]   # → catalog/skills/{tdd,...}.md
+```
+
+- **Tools** = MCP servers / custom integrations.
+- **Binaries** = system CLIs (`python`, `gh`, `docker`). Two-layer permission: `shell:execute` capability *plus* the binary appears in this list.
+- **Skills** = system-prompt seed bodies (markdown). Hand-curated institutional knowledge that gets prepended to the using agent's context.
+
+The validator (`/speckit.company.validate --catalog <dir>`) refuses to start a company that references unknown IDs or that uses a tool/binary without holding the required capabilities. See [docs/catalog.md](catalog.md) for the full schema.
+
 ## Editing a company
 
 Everything is a file under `.specify/org/`. Open `agents/<role>.md` in any editor and tweak the persona, tools, capabilities. Re-run `/speckit.company.validate` to confirm consistency. No "redeploy" step.

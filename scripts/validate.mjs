@@ -23,10 +23,15 @@ const KNOWN_RUNNER_TYPES = new Set(["ephemeral", "persistent", "scheduled"]);
  *   <orgDir>/constitution.md         (frontmatter + body)
  *   <orgDir>/agents/<role>.md        (frontmatter + persona body, one file per role)
  *
+ * @param {string} orgDir
+ * @param {object} [options]
+ * @param {string} [options.catalogDir]   if set, agent tool/skill references
+ *                                        are validated against the central catalog
+ *
  * Returns an array of findings with shape:
  *   { severity: "error" | "warning" | "info", code: string, message: string, location?: string }
  */
-export async function validateCompany(orgDir) {
+export async function validateCompany(orgDir, options = {}) {
   const findings = [];
 
   if (!(await isDirectory(orgDir))) {
@@ -49,7 +54,120 @@ export async function validateCompany(orgDir) {
   validateAgentFields(agents, constitution, findings);
   validateGraph(agents, findings);
 
+  if (options.catalogDir) {
+    await validateAgainstCatalog(agents, options.catalogDir, findings);
+  }
+
   return { findings };
+}
+
+async function validateAgainstCatalog(agents, catalogDir, findings) {
+  const catalog = await loadCatalogFromDisk(catalogDir);
+  for (const agent of agents) {
+    const role = agent.role ?? "?";
+    const grantedCaps = new Set(agent.capabilities ?? []);
+    const grantedClasses = new Set();
+    for (const g of grantedCaps) {
+      if (g.endsWith(":any")) grantedClasses.add(g.split(":")[0]);
+    }
+
+    for (const toolId of agent.tools?.mcp ?? []) {
+      const tool = catalog.tools.get(toolId);
+      if (!tool) {
+        findings.push({
+          severity: "error",
+          code: "E_UNKNOWN_TOOL_REFERENCE",
+          message: `agent '${role}' references unknown tool '${toolId}' (not in catalog ${catalogDir})`,
+          location: agent._file,
+        });
+        continue;
+      }
+      const missing = (tool.required_capabilities ?? []).filter(
+        (req) => !grantedCaps.has(req) && !grantedClasses.has(req.split(":")[0])
+      );
+      if (missing.length > 0) {
+        findings.push({
+          severity: "error",
+          code: "E_TOOL_CAPABILITY_MISSING",
+          message: `agent '${role}' uses tool '${toolId}' which requires capabilities ${JSON.stringify(missing)} not granted to this agent`,
+          location: agent._file,
+        });
+      }
+    }
+
+    for (const binId of agent.tools?.binaries ?? []) {
+      const bin = catalog.binaries?.get(binId);
+      if (!bin) {
+        findings.push({
+          severity: "error",
+          code: "E_UNKNOWN_BINARY_REFERENCE",
+          message: `agent '${role}' references unknown binary '${binId}' (not in catalog ${catalogDir})`,
+          location: agent._file,
+        });
+        continue;
+      }
+      const missing = (bin.required_capabilities ?? []).filter(
+        (req) => !grantedCaps.has(req) && !grantedClasses.has(req.split(":")[0])
+      );
+      if (missing.length > 0) {
+        findings.push({
+          severity: "error",
+          code: "E_BINARY_CAPABILITY_MISSING",
+          message: `agent '${role}' uses binary '${binId}' which requires capabilities ${JSON.stringify(missing)} not granted to this agent`,
+          location: agent._file,
+        });
+      }
+    }
+
+    for (const skillId of agent.skills ?? []) {
+      if (!catalog.skills.has(skillId)) {
+        findings.push({
+          severity: "error",
+          code: "E_UNKNOWN_SKILL_REFERENCE",
+          message: `agent '${role}' references unknown skill '${skillId}' (not in catalog ${catalogDir})`,
+          location: agent._file,
+        });
+      }
+    }
+  }
+}
+
+async function loadCatalogFromDisk(catalogDir) {
+  const tools = new Map();
+  const skills = new Map();
+  const binaries = new Map();
+  const toolsDir = path.join(catalogDir, "tools");
+  const skillsDir = path.join(catalogDir, "skills");
+  const binariesDir = path.join(catalogDir, "binaries");
+  if (await isDirectory(toolsDir)) {
+    const files = (await readdir(toolsDir)).filter(
+      (f) => f.endsWith(".yml") || f.endsWith(".yaml")
+    );
+    for (const file of files) {
+      const raw = await readFile(path.join(toolsDir, file), "utf8");
+      const spec = parseYaml(raw);
+      if (spec?.id) tools.set(spec.id, spec);
+    }
+  }
+  if (await isDirectory(skillsDir)) {
+    const files = (await readdir(skillsDir)).filter((f) => f.endsWith(".md"));
+    for (const file of files) {
+      const raw = await readFile(path.join(skillsDir, file), "utf8");
+      const fm = parseFrontmatter(raw);
+      if (fm?.id) skills.set(fm.id, fm);
+    }
+  }
+  if (await isDirectory(binariesDir)) {
+    const files = (await readdir(binariesDir)).filter(
+      (f) => f.endsWith(".yml") || f.endsWith(".yaml")
+    );
+    for (const file of files) {
+      const raw = await readFile(path.join(binariesDir, file), "utf8");
+      const spec = parseYaml(raw);
+      if (spec?.id) binaries.set(spec.id, spec);
+    }
+  }
+  return { tools, skills, binaries };
 }
 
 async function isDirectory(p) {
@@ -298,12 +416,24 @@ function parseFrontmatter(raw) {
 
 // CLI entry
 if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
-  const orgDir = process.argv[2];
+  const args = process.argv.slice(2);
+  const positional = [];
+  let catalogDir = null;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--catalog") {
+      catalogDir = args[++i];
+    } else if (args[i].startsWith("--catalog=")) {
+      catalogDir = args[i].slice("--catalog=".length);
+    } else {
+      positional.push(args[i]);
+    }
+  }
+  const orgDir = positional[0];
   if (!orgDir) {
-    console.error("Usage: validate.mjs <org-dir>");
+    console.error("Usage: validate.mjs <org-dir> [--catalog <catalog-dir>]");
     process.exit(2);
   }
-  const { findings } = await validateCompany(orgDir);
+  const { findings } = await validateCompany(orgDir, { catalogDir });
   if (findings.length === 0) {
     console.log("✓ Validation passed: 0 findings.");
     process.exit(0);

@@ -1,0 +1,19 @@
+id: "{{id}}"                # unique slug, lowercase-hyphenated
+name: "{{name}}"            # human label
+type: mcp                   # mcp | builtin | custom
+
+# For type=mcp:
+transport: stdio            # stdio | sse | http
+command: "{{command}}"      # binary or interpreter
+args: []                    # CLI args
+env_keys: []                # env-var names this tool requires (e.g. API tokens)
+
+description: "{{description}}"
+
+# Capabilities the agent must have granted to use this tool. The validator
+# enforces this — an agent that references this tool but lacks any of these
+# capabilities will fail validation with E_TOOL_CAPABILITY_MISSING.
+required_capabilities: []
+
+tags:                       # free-form labels for catalog browsing
+  - {{tag}}

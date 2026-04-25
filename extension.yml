@@ -40,6 +40,9 @@ provides:
     - name: speckit.company.start
       file: commands/speckit.company.start.md
       description: "Hand the company over to the runtime: activate CEO (persistent mode), start queue polling."
+    - name: speckit.company.catalog
+      file: commands/speckit.company.catalog.md
+      description: "Manage the central tool/skill catalog: list, add, remove, show."
 
   config:
     - name: "company.yml"

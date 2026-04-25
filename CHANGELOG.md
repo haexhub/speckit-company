@@ -16,3 +16,19 @@ All notable changes to this extension are documented here. Format follows
 - HTTP backend (`http-backend.mjs`) for routing CEO tool calls to a live haex-corp runtime via configurable `FIRMA_OPS_BASE_URL` / `FIRMA_OPS_PROJECT` env.
 - Documentation: `docs/INSTALL.md` (production + dev install, Hermes setup, troubleshooting), `docs/concepts.md` (spec hierarchy, capabilities, autonomy, worktree isolation, retirement).
 - 35 unit + acceptance tests, all green. TDD throughout: tests written before implementation for validator, renderer, and HTTP backend.
+
+### Inkrement 4 — central tool & skill catalog
+
+- New slash command `/speckit.company.catalog` (list, show, add, remove, validate).
+- New templates `templates/tool.yml` and `templates/skill.md`.
+- `validate.mjs` accepts `--catalog <dir>` and emits three new error codes: `E_UNKNOWN_TOOL_REFERENCE`, `E_UNKNOWN_SKILL_REFERENCE`, `E_TOOL_CAPABILITY_MISSING`.
+- `extension.yml` registers the new command.
+- `docs/catalog.md` covers the schema, validation rules, and seed-skill vs. Hermes-curated-skill distinction.
+- 38 tests green (3 new for catalog validation).
+
+#### Inkrement 4b — binaries as third catalog category
+
+- New catalog category `<haex-corp>/catalog/binaries/<id>.yml` for system-installed CLIs (`python3`, `node`, `pnpm`, `gh`, `git`, `docker`, `curl`, `jq`, `yq`, `rg` shipped as seeds).
+- Agent frontmatter `tools.binaries: [...]` is the new binary-whitelist field. Two-layer permission: `shell:execute` capability *plus* the binary appears in the list.
+- Validator emits `E_UNKNOWN_BINARY_REFERENCE` and `E_BINARY_CAPABILITY_MISSING`.
+- Templates and docs updated. 41 tests green (3 new binary-validation tests).

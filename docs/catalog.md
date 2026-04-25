@@ -1,0 +1,151 @@
+# The central tool & skill catalog
+
+The catalog is the single source of truth for which **tools** (MCP servers, custom integrations) and **skills** (system-prompt seed bodies) are available to every agent on this haex-corp instance. Agents reference catalog entries by ID; the runtime resolves them at spawn time; the validator refuses to start a company that references unknown IDs or lacks the capabilities a tool requires.
+
+This decouples *capability deployment* from *agent definition*: when you set up a new MCP server (e.g. add Linear support), you add a single tool manifest, and every agent that needs Linear lists `linear` in its `tools.mcp`. No copy-pasting MCP config across agents.
+
+## Layout
+
+```
+<haex-corp>/catalog/
+├── tools/                    MCP servers, custom integrations
+│   ├── firma-ops.yml           (bundled with speckit-company)
+│   ├── github.yml
+│   ├── slack.yml
+│   ├── playwright.yml
+│   ├── filesystem.yml
+│   └── ...your additions
+├── skills/                   system-prompt seed bodies (markdown)
+│   ├── tdd.md
+│   ├── verification-before-completion.md
+│   ├── systematic-debugging.md
+│   ├── defensive-defaults.md
+│   ├── pr-review-checklist.md
+│   └── ...your additions
+└── binaries/                 system-installed CLIs (python3, gh, docker, …)
+    ├── python3.yml
+    ├── node.yml
+    ├── pnpm.yml
+    ├── gh.yml
+    ├── git.yml
+    ├── docker.yml
+    ├── curl.yml
+    ├── jq.yml
+    ├── yq.yml
+    ├── rg.yml
+    └── ...your additions
+```
+
+## Tool manifest
+
+```yaml
+# catalog/tools/<id>.yml
+id: github
+name: "GitHub MCP"
+type: mcp                       # mcp | builtin | custom
+transport: stdio                # for type=mcp
+command: "uvx"
+args: ["mcp-server-github"]
+env_keys: [GITHUB_TOKEN]        # required env vars
+description: "Read/write GitHub repos, issues, PRs."
+required_capabilities:          # any agent using this tool MUST have these granted
+  - secrets:read_env
+  - network:http_post
+  - account:github
+tags: [vcs, collaboration]
+```
+
+## Binary manifest
+
+```yaml
+# catalog/binaries/<id>.yml
+id: gh
+name: "GitHub CLI"
+type: binary
+command: "gh"                    # binary name on $PATH (or absolute path)
+version_check: "gh --version"   # informational
+description: "Official GitHub CLI."
+required_capabilities:           # an agent must hold these to use the binary
+  - shell:execute
+  - network:http_post
+  - secrets:read_env
+  - account:github
+tags: [vcs, github]
+```
+
+`shell:execute` is necessary but not sufficient — the agent must additionally list the binary in `tools.binaries: [...]`. This is the **binary whitelist** layer: even if `shell:execute` is granted broadly, the agent can only invoke binaries that appear in its list.
+
+The runtime can probe `$PATH` to confirm declared binaries are actually installed (`checkBinaryAvailability(catalog)` returns `{present, missing}`). Missing binaries surface as warnings — useful when staging a setup on a new machine.
+
+## Skill manifest
+
+```markdown
+---
+id: tdd
+name: "Test-Driven Development"
+description: "Red → green → refactor."
+tags: [quality, engineering]
+---
+
+# Test-Driven Development
+
+(Markdown body — gets injected into the system prompt of every agent that
+lists this skill in its `skills:` array.)
+```
+
+## Agent reference
+
+```yaml
+# .specify/org/agents/backend-dev.md
+---
+role: backend-dev
+tools:
+  builtin: [Read, Edit, Bash]
+  mcp: [github, firma-ops]              # → catalog/tools/{github,firma-ops}.yml
+  binaries: [git, gh, python3, jq]      # → catalog/binaries/{git,gh,python3,jq}.yml
+skills: [tdd, verification-before-completion]   # → catalog/skills/{tdd,verification-before-completion}.md
+capabilities:
+  - filesystem:write
+  - shell:execute
+  - secrets:read_env
+  - network:http_post
+  - account:github
+---
+```
+
+## Validation rules
+
+`validate.mjs --catalog <catalog-dir>` adds three new error codes on top of the standard org-spec checks:
+
+| Code | Meaning |
+|---|---|
+| `E_UNKNOWN_TOOL_REFERENCE` | Agent references a tool id that doesn't exist in `<catalog>/tools/`. |
+| `E_UNKNOWN_SKILL_REFERENCE` | Agent references a skill id that doesn't exist in `<catalog>/skills/`. |
+| `E_UNKNOWN_BINARY_REFERENCE` | Agent references a binary id that doesn't exist in `<catalog>/binaries/`. |
+| `E_TOOL_CAPABILITY_MISSING` | Agent references a tool whose `required_capabilities` aren't all granted. |
+| `E_BINARY_CAPABILITY_MISSING` | Agent references a binary whose `required_capabilities` aren't all granted. |
+
+The `start` runtime in haex-corp also runs these checks via `CompanyRuntime` when `catalogDir` is set; failure aborts startup.
+
+## Workflow
+
+1. **One-time:** install MCP servers locally (e.g. `uvx mcp-server-github`).
+2. **One-time:** drop a manifest into `catalog/tools/<id>.yml`. Or use `/speckit.company.catalog add tool <id>`.
+3. **Per agent:** list the tool ID in `agents/<role>.md::tools.mcp`.
+4. **Run** `/speckit.company.validate --catalog <catalog>`. 0 errors = ready.
+5. **Run** `/speckit.company.start`. The runtime hydrates references, sets up Hermes per agent, opens the queue.
+
+Adding a new tool to your repertoire is therefore a single file write + a re-validate. No code changes anywhere else.
+
+## Per-company overrides (planned)
+
+Drop a manifest under `<spec-kit-project>/.specify/org/catalog/{tools,skills}/<id>.{yml,md}` to override a global entry for one specific company (e.g. point `github` at a self-hosted GHE instance for one team). Per-company entries take precedence over global ones. *(Not implemented in v0.1; the structure is reserved.)*
+
+## Skills vs. Hermes self-curated skills
+
+The catalog skills are **seed skills** — kuratiertes Knowhow, hand-written by you, prepended to every using agent's system prompt. Hermes additionally accumulates its own skills automatically as it works (per-agent, in `<project>/.hermes/<role>/skills/`). The two coexist:
+
+- **Catalog skills** = stable institutional knowledge ("how we do TDD here", "our PR review checklist").
+- **Hermes-curated skills** = role-specific, learned-by-doing knowledge that grows over the agent's lifetime.
+
+Don't try to put role-specific learnings into catalog skills — let Hermes do that. Use catalog skills for things you'd write in an employee handbook.
