@@ -64,14 +64,20 @@ name: "GitHub CLI"
 type: binary
 command: "gh"                    # binary name on $PATH (or absolute path)
 version_check: "gh --version"   # informational
-description: "Official GitHub CLI."
-required_capabilities:           # an agent must hold these to use the binary
+description: |
+  Official GitHub CLI. Read-only ops need network:http_get + account:github.
+  Mutating ops add network:http_post. Auth uses secrets:read_env if a token
+  is supplied. Grant capabilities matching the agent's intended ops.
+required_capabilities:           # MINIMUM to invoke the binary at all
   - shell:execute
-  - network:http_post
-  - secrets:read_env
-  - account:github
 tags: [vcs, github]
 ```
+
+### Minimum-required principle
+
+`required_capabilities` lists the **minimum capabilities to invoke the binary at all**, not the maximum needed for every conceivable operation. For most binaries that's just `shell:execute`. Exceptions are tools whose *entire purpose* is one capability class — `curl` requires `network:http_get` because there's no curl-without-HTTP, `rg` requires `filesystem:read` because there's no ripgrep-without-files.
+
+This shifts the responsibility for use-case-specific capabilities to the **agent author**. If your agent does `git status` in a local repo, `binaries: [git]` + `capabilities: [shell:execute, filesystem:read]` is enough. If it does `git push`, add `filesystem:write` and `network:http_post`. **Three different agents can share one git manifest without one of them being over-granted.**
 
 `shell:execute` is necessary but not sufficient — the agent must additionally list the binary in `tools.binaries: [...]`. This is the **binary whitelist** layer: even if `shell:execute` is granted broadly, the agent can only invoke binaries that appear in its list.
 

@@ -39,3 +39,11 @@ All notable changes to this extension are documented here. Format follows
 - Added wildcard support: `tools.mcp: ["*"]`, `tools.binaries: ["*"]`, `skills: ["*"]` expand to all catalog entries. Wildcard is a convenience shortcut and does not bypass capability checks — each expanded entry is still validated against the agent's granted capabilities.
 - Mixed wildcard (`["python3", "*"]`) degenerates to a plain wildcard.
 - 43 tests green (2 new wildcard-validation tests).
+
+#### Inkrement 4d — minimum-required capability principle for binaries
+
+- Reworked all binary manifests in `<haex-corp>/catalog/binaries/` to declare only the **minimum capabilities to invoke the binary at all**, not the maximum needed for any operation.
+- Most binaries (python3, node, pnpm, gh, git, docker, jq, yq) now require only `shell:execute`. Exceptions: `curl` (requires `network:http_get` — HTTP is its entire purpose), `rg` (requires `filesystem:read` — file searching is its entire purpose).
+- Use-case-specific capabilities (filesystem:write for `git commit`, network:http_post for `gh pr create`, etc.) move from the binary manifest to the agent's own `capabilities` list — where they belong, because only the agent author knows the use case.
+- Result: a single binary manifest now serves read-only and write-mode agents alike. A read-only audit worker can have `binaries: [git]` + `capabilities: [shell:execute, filesystem:read]` and pass validation; a commit-fähig worker adds `filesystem:write`. No over-granting.
+- Test for `gh` capability gap rewritten to use `curl` (still has multi-cap requirement). docs/catalog.md updated with a "Minimum-required principle" subsection.
