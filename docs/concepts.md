@@ -43,7 +43,7 @@ Each agent declares a list of allowed capabilities. Anything not listed is forbi
 capabilities:
   - filesystem:write
   - shell:execute
-  - network:http_get
+  - network:http
 ```
 
 Categories:
@@ -52,7 +52,7 @@ Categories:
 |---|---|
 | `filesystem` | `read`, `write`, `delete` |
 | `shell` | `execute`, `execute_sandboxed` |
-| `network` | `http_get`, `http_post`, `any` |
+| `network` | `http`, `any` |
 | `code` | `interpret`, `compile`, `run_tests` |
 | `secrets` | `read_env`, `read_vault` |
 | `payment` | `simulate`, `execute_below_<amount>`, `execute_unrestricted` |

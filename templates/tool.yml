@@ -10,9 +10,10 @@ env_keys: []                # env-var names this tool requires (e.g. API tokens)
 
 description: "{{description}}"
 
-# Capabilities the agent must have granted to use this tool. The validator
-# enforces this — an agent that references this tool but lacks any of these
-# capabilities will fail validation with E_TOOL_CAPABILITY_MISSING.
+# Informational: capabilities a typical agent author should grant to use this
+# tool meaningfully. The validator does NOT enforce these — runtime
+# (capability-gate.js) is the actual gate. Treat this list as documentation,
+# not a contract.
 required_capabilities: []
 
 tags:                       # free-form labels for catalog browsing

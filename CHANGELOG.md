@@ -43,7 +43,14 @@ All notable changes to this extension are documented here. Format follows
 #### Inkrement 4d — minimum-required capability principle for binaries
 
 - Reworked all binary manifests in `<haex-corp>/catalog/binaries/` to declare only the **minimum capabilities to invoke the binary at all**, not the maximum needed for any operation.
-- Most binaries (python3, node, pnpm, gh, git, docker, jq, yq) now require only `shell:execute`. Exceptions: `curl` (requires `network:http_get` — HTTP is its entire purpose), `rg` (requires `filesystem:read` — file searching is its entire purpose).
-- Use-case-specific capabilities (filesystem:write for `git commit`, network:http_post for `gh pr create`, etc.) move from the binary manifest to the agent's own `capabilities` list — where they belong, because only the agent author knows the use case.
+- Most binaries (python3, node, pnpm, gh, git, docker, jq, yq) now require only `shell:execute`. Exceptions: `curl` (requires `network:http` — HTTP is its entire purpose), `rg` (requires `filesystem:read` — file searching is its entire purpose).
+- Use-case-specific capabilities (filesystem:write for `git commit`, network:http for `gh pr create`, etc.) move from the binary manifest to the agent's own `capabilities` list — where they belong, because only the agent author knows the use case.
 - Result: a single binary manifest now serves read-only and write-mode agents alike. A read-only audit worker can have `binaries: [git]` + `capabilities: [shell:execute, filesystem:read]` and pass validation; a commit-fähig worker adds `filesystem:write`. No over-granting.
 - Test for `gh` capability gap rewritten to use `curl` (still has multi-cap requirement). docs/catalog.md updated with a "Minimum-required principle" subsection.
+
+#### Inkrement 4e — runtime-only capability enforcement, simplified network classes
+
+- **Removed `E_TOOL_CAPABILITY_MISSING` and `E_BINARY_CAPABILITY_MISSING` from the validator.** Static capability gap checks gave false security — a `git` manifest can't predict whether the agent will run `git status` (read-only) or `git push` (network+write). The runtime (`capability-gate.js`) is the only meaningful enforcement layer; the validator's job is now to catch typos / dangling references only.
+- `required_capabilities` in tool/binary manifests is now **informational documentation**, not enforced. Validator skips it.
+- **Network capability classes simplified**: `network:http_get` and `network:http_post` collapsed into a single `network:http`. `network:any` remains as the broad escape hatch. HTTP-method-level granularity gave false precision — actual access control is at the network/syscall level.
+- 43 tests green (3 tests rewritten to assert validator no longer enforces capability gaps; the runtime-side `capability-gate.js` keeps its 11 tests intact for the actual enforcement path).

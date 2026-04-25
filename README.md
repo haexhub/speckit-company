@@ -51,7 +51,7 @@ tools:
 capabilities:                   # default-deny
   - filesystem:write
   - shell:execute
-  - network:http_get
+  - network:http
 status: active                  # active | pending_retire | retired
 ---
 # Persona

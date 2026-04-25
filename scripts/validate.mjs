@@ -67,36 +67,33 @@ function expandWildcards(refs, catalogMap) {
   return refs;
 }
 
+/**
+ * Catalog reference validation — checks that every tool/binary/skill referenced
+ * by agents resolves to an entry in the catalog. Wildcards (`["*"]`) are
+ * expanded against the catalog before checks.
+ *
+ * Capability *enforcement* is intentionally NOT done here. The runtime
+ * (haex-corp's capability-gate) decides at each tool invocation whether the
+ * agent's granted capabilities cover the actual operation. Static enforcement
+ * would have to predict subcommand requirements (git status vs. git push,
+ * gh repo view vs. gh pr create) which is brittle and provides no real
+ * security — runtime is the only meaningful gate.
+ *
+ * Manifest `required_capabilities` therefore stay as informational
+ * documentation; this function does not enforce them.
+ */
 async function validateAgainstCatalog(agents, catalogDir, findings) {
   const catalog = await loadCatalogFromDisk(catalogDir);
   for (const agent of agents) {
     const role = agent.role ?? "?";
-    const grantedCaps = new Set(agent.capabilities ?? []);
-    const grantedClasses = new Set();
-    for (const g of grantedCaps) {
-      if (g.endsWith(":any")) grantedClasses.add(g.split(":")[0]);
-    }
 
     const toolRefs = expandWildcards(agent.tools?.mcp ?? [], catalog.tools);
     for (const toolId of toolRefs) {
-      const tool = catalog.tools.get(toolId);
-      if (!tool) {
+      if (!catalog.tools.get(toolId)) {
         findings.push({
           severity: "error",
           code: "E_UNKNOWN_TOOL_REFERENCE",
           message: `agent '${role}' references unknown tool '${toolId}' (not in catalog ${catalogDir})`,
-          location: agent._file,
-        });
-        continue;
-      }
-      const missing = (tool.required_capabilities ?? []).filter(
-        (req) => !grantedCaps.has(req) && !grantedClasses.has(req.split(":")[0])
-      );
-      if (missing.length > 0) {
-        findings.push({
-          severity: "error",
-          code: "E_TOOL_CAPABILITY_MISSING",
-          message: `agent '${role}' uses tool '${toolId}' which requires capabilities ${JSON.stringify(missing)} not granted to this agent`,
           location: agent._file,
         });
       }
@@ -104,24 +101,11 @@ async function validateAgainstCatalog(agents, catalogDir, findings) {
 
     const binRefs = expandWildcards(agent.tools?.binaries ?? [], catalog.binaries ?? new Map());
     for (const binId of binRefs) {
-      const bin = catalog.binaries?.get(binId);
-      if (!bin) {
+      if (!catalog.binaries?.get(binId)) {
         findings.push({
           severity: "error",
           code: "E_UNKNOWN_BINARY_REFERENCE",
           message: `agent '${role}' references unknown binary '${binId}' (not in catalog ${catalogDir})`,
-          location: agent._file,
-        });
-        continue;
-      }
-      const missing = (bin.required_capabilities ?? []).filter(
-        (req) => !grantedCaps.has(req) && !grantedClasses.has(req.split(":")[0])
-      );
-      if (missing.length > 0) {
-        findings.push({
-          severity: "error",
-          code: "E_BINARY_CAPABILITY_MISSING",
-          message: `agent '${role}' uses binary '${binId}' which requires capabilities ${JSON.stringify(missing)} not granted to this agent`,
           location: agent._file,
         });
       }

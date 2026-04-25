@@ -11,7 +11,7 @@ tools:
   mcp: []
 capabilities:
   - filesystem:read
-  - network:http_get
+  - network:http
 status: active
 ---
 

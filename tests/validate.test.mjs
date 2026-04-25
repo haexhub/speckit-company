@@ -114,11 +114,12 @@ test("with --catalog: agent referencing unknown tool yields E_UNKNOWN_TOOL_REFER
   }
 });
 
-test("with --catalog: agent missing required tool capability yields E_TOOL_CAPABILITY_MISSING", async () => {
+test("with --catalog: tool required_capabilities are NOT enforced (runtime job)", async () => {
+  // Even though company-ops declares required_capabilities the agent lacks,
+  // validation passes — capability enforcement happens at runtime, not here.
   const dir = await mkdtemp(path.join(os.tmpdir(), "vc-cat-strict-"));
   await mkdir(path.join(dir, "tools"), { recursive: true });
   await mkdir(path.join(dir, "skills"), { recursive: true });
-  // Tool that requires a capability the ceo doesn't have
   await writeFile(
     path.join(dir, "tools", "company-ops.yml"),
     `id: company-ops
@@ -127,9 +128,19 @@ description: "test"
 required_capabilities: [payment:execute_unrestricted]
 `
   );
+  // valid-finite's dev.md references skill 'tdd' — add it so we don't trigger
+  // an unrelated E_UNKNOWN_SKILL_REFERENCE.
+  await writeFile(
+    path.join(dir, "skills", "tdd.md"),
+    `---
+id: tdd
+---
+body
+`
+  );
   try {
     const { findings } = await validateCompany(fixtures("valid-finite"), { catalogDir: dir });
-    assert.ok(errorCodes(findings).includes("E_TOOL_CAPABILITY_MISSING"));
+    assert.deepEqual(errorCodes(findings), []);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
@@ -198,12 +209,13 @@ test("with --catalog: unknown binary reference yields E_UNKNOWN_BINARY_REFERENCE
   }
 });
 
-test("with --catalog: binary capability gap yields E_BINARY_CAPABILITY_MISSING", async () => {
+test("with --catalog: binary required_capabilities are NOT enforced (runtime job)", async () => {
+  // money-cli declares payment:execute_unrestricted; agent lacks it.
+  // Validation passes — runtime is the gate.
   const cat = await mkdtemp(path.join(os.tmpdir(), "vc-cat-bin-cap-"));
   await mkdir(path.join(cat, "tools"), { recursive: true });
   await mkdir(path.join(cat, "skills"), { recursive: true });
   await mkdir(path.join(cat, "binaries"), { recursive: true });
-  // binary needs payment:execute_unrestricted, ceo only has shell:execute + filesystem:read
   await writeFile(
     path.join(cat, "binaries", "money-cli.yml"),
     `id: money-cli
@@ -216,7 +228,7 @@ required_capabilities: [shell:execute, payment:execute_unrestricted]
   const { proj, orgDir } = await makeFixtureWithBinary("money-cli");
   try {
     const { findings } = await validateCompany(orgDir, { catalogDir: cat });
-    assert.ok(errorCodes(findings).includes("E_BINARY_CAPABILITY_MISSING"));
+    assert.deepEqual(errorCodes(findings), []);
   } finally {
     await rm(proj, { recursive: true, force: true });
     await rm(cat, { recursive: true, force: true });
@@ -293,7 +305,7 @@ status: active
   return { proj, orgDir };
 }
 
-test("with --catalog: wildcard ['*'] in binaries expands and runs capability checks", async () => {
+test("with --catalog: wildcard ['*'] in binaries expands without enforcing capabilities", async () => {
   const cat = await mkdtemp(path.join(os.tmpdir(), "vc-wild-cat-"));
   await mkdir(path.join(cat, "tools"), { recursive: true });
   await mkdir(path.join(cat, "skills"), { recursive: true });
@@ -316,11 +328,13 @@ description: "GitHub CLI"
 required_capabilities: [shell:execute, account:github]
 `
   );
-  // Agent grabs all binaries via wildcard but lacks account:github → gh fails.
+  // Agent grabs all binaries via wildcard with only shell:execute. The
+  // wildcard expands cleanly; no capability gap is reported because runtime
+  // is the enforcement layer, not the validator.
   const { proj, orgDir } = await makeFixtureWithToolsAndBinaries([], ["*"], ["shell:execute"]);
   try {
     const { findings } = await validateCompany(orgDir, { catalogDir: cat });
-    assert.ok(errorCodes(findings).includes("E_BINARY_CAPABILITY_MISSING"));
+    assert.deepEqual(errorCodes(findings), []);
   } finally {
     await rm(proj, { recursive: true, force: true });
     await rm(cat, { recursive: true, force: true });

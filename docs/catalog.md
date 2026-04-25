@@ -50,7 +50,7 @@ env_keys: [GITHUB_TOKEN]        # required env vars
 description: "Read/write GitHub repos, issues, PRs."
 required_capabilities:          # any agent using this tool MUST have these granted
   - secrets:read_env
-  - network:http_post
+  - network:http
   - account:github
 tags: [vcs, collaboration]
 ```
@@ -65,8 +65,8 @@ type: binary
 command: "gh"                    # binary name on $PATH (or absolute path)
 version_check: "gh --version"   # informational
 description: |
-  Official GitHub CLI. Read-only ops need network:http_get + account:github.
-  Mutating ops add network:http_post. Auth uses secrets:read_env if a token
+  Official GitHub CLI. Read-only ops need network:http + account:github.
+  Mutating ops add network:http. Auth uses secrets:read_env if a token
   is supplied. Grant capabilities matching the agent's intended ops.
 required_capabilities:           # MINIMUM to invoke the binary at all
   - shell:execute
@@ -75,9 +75,9 @@ tags: [vcs, github]
 
 ### Minimum-required principle
 
-`required_capabilities` lists the **minimum capabilities to invoke the binary at all**, not the maximum needed for every conceivable operation. For most binaries that's just `shell:execute`. Exceptions are tools whose *entire purpose* is one capability class — `curl` requires `network:http_get` because there's no curl-without-HTTP, `rg` requires `filesystem:read` because there's no ripgrep-without-files.
+`required_capabilities` lists the **minimum capabilities to invoke the binary at all**, not the maximum needed for every conceivable operation. For most binaries that's just `shell:execute`. Exceptions are tools whose *entire purpose* is one capability class — `curl` requires `network:http` because there's no curl-without-HTTP, `rg` requires `filesystem:read` because there's no ripgrep-without-files.
 
-This shifts the responsibility for use-case-specific capabilities to the **agent author**. If your agent does `git status` in a local repo, `binaries: [git]` + `capabilities: [shell:execute, filesystem:read]` is enough. If it does `git push`, add `filesystem:write` and `network:http_post`. **Three different agents can share one git manifest without one of them being over-granted.**
+This shifts the responsibility for use-case-specific capabilities to the **agent author**. If your agent does `git status` in a local repo, `binaries: [git]` + `capabilities: [shell:execute, filesystem:read]` is enough. If it does `git push`, add `filesystem:write` and `network:http`. **Three different agents can share one git manifest without one of them being over-granted.**
 
 `shell:execute` is necessary but not sufficient — the agent must additionally list the binary in `tools.binaries: [...]`. This is the **binary whitelist** layer: even if `shell:execute` is granted broadly, the agent can only invoke binaries that appear in its list.
 
@@ -114,7 +114,7 @@ capabilities:
   - filesystem:write
   - shell:execute
   - secrets:read_env
-  - network:http_post
+  - network:http
   - account:github
 ---
 ```
@@ -130,7 +130,7 @@ tools:
 skills: ["*"]             # all skills in catalog/skills/
 ```
 
-Wildcard is a **convenience shortcut**, not a permission bypass. The validator and runtime expand `["*"]` to the concrete catalog list and apply the per-entry capability checks normally — so an agent with `binaries: ["*"]` and only `[shell:execute]` granted will still fail validation if any catalog binary requires additional capabilities (e.g. `gh` needs `account:github`).
+Wildcard is a **convenience shortcut**, not a permission bypass. The validator and runtime expand `["*"]` to the concrete catalog list. Validation only checks references resolve; capability enforcement happens at runtime when the agent actually invokes a tool. An agent with `binaries: ["*"]` and only `[shell:execute]` will pass validation but the runtime will refuse any operation that exceeds the granted capabilities.
 
 Mixing literal IDs with `*` (`["python3", "*"]`) is allowed and degenerates to a plain wildcard — the explicit IDs are subsumed by the global expansion.
 
@@ -141,17 +141,25 @@ Use cases:
 
 ## Validation rules
 
-`validate.mjs --catalog <catalog-dir>` adds three new error codes on top of the standard org-spec checks:
+`validate.mjs --catalog <catalog-dir>` is a **reference checker**, not a security gate. It catches typos and stale IDs:
 
 | Code | Meaning |
 |---|---|
 | `E_UNKNOWN_TOOL_REFERENCE` | Agent references a tool id that doesn't exist in `<catalog>/tools/`. |
 | `E_UNKNOWN_SKILL_REFERENCE` | Agent references a skill id that doesn't exist in `<catalog>/skills/`. |
 | `E_UNKNOWN_BINARY_REFERENCE` | Agent references a binary id that doesn't exist in `<catalog>/binaries/`. |
-| `E_TOOL_CAPABILITY_MISSING` | Agent references a tool whose `required_capabilities` aren't all granted. |
-| `E_BINARY_CAPABILITY_MISSING` | Agent references a binary whose `required_capabilities` aren't all granted. |
 
-The `start` runtime in haex-corp also runs these checks via `CompanyRuntime` when `catalogDir` is set; failure aborts startup.
+### Why no static capability gap check?
+
+An earlier draft checked agent capabilities against `tool.required_capabilities` / `binary.required_capabilities`. We removed that because:
+
+- Binaries like `git`, `gh`, `docker` cover both read-only and mutating operations within one CLI. There is no single static cap-set that's right.
+- Static checks give a false sense of security — they don't actually prevent anything; the agent still calls the binary.
+- The **real gate is the runtime**: when an agent invokes a tool, `capability-gate.js` checks the granted capabilities and refuses operations that exceed them. That's where security lives.
+
+`required_capabilities` in manifests therefore stays as informational documentation: it tells a human reader what a typical agent author should grant. The validator does not enforce it.
+
+The `start` runtime in haex-corp also runs the reference check via `CompanyRuntime` when `catalogDir` is set; dangling references abort startup.
 
 ## Workflow
 
