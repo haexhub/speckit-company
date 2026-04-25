@@ -114,11 +114,11 @@ skills: [tdd, verification-before-completion]   # → catalog/skills/{tdd,...}.m
 - **Binaries** = system CLIs (`python`, `gh`, `docker`). Two-layer permission: `shell:execute` capability *plus* the binary appears in this list.
 - **Skills** = system-prompt seed bodies (markdown). Hand-curated institutional knowledge that gets prepended to the using agent's context.
 
-The validator (`/speckit.company.validate --catalog <dir>`) refuses to start a company that references unknown IDs or that uses a tool/binary without holding the required capabilities. See [docs/catalog.md](catalog.md) for the full schema.
+The validator (`/speckit-company.validate --catalog <dir>`) refuses to start a company that references unknown IDs or that uses a tool/binary without holding the required capabilities. See [docs/catalog.md](catalog.md) for the full schema.
 
 ## Editing a company
 
-Everything is a file under `.specify/org/`. Open `agents/<role>.md` in any editor and tweak the persona, tools, capabilities. Re-run `/speckit.company.validate` to confirm consistency. No "redeploy" step.
+Everything is a file under `.specify/org/`. Open `agents/<role>.md` in any editor and tweak the persona, tools, capabilities. Re-run `/speckit-company.validate` to confirm consistency. No "redeploy" step.
 
 ## Retiring an agent
 

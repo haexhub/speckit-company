@@ -16,7 +16,7 @@ Optional: a key=value pair to override a single field non-interactively, e.g. `o
 
 ## Prerequisites
 
-1. `.specify/org/constitution.md` exists (created by `/speckit.company.init`).
+1. `.specify/org/constitution.md` exists (created by `/speckit-company.init`).
 
 ## Steps
 

@@ -18,7 +18,7 @@ Expected form: a single slug (lowercase, hyphenated) that names the company. Exa
 
 1. The current directory is a spec-kit project (`.specify/` exists at repo root).
 2. The slug matches `^[a-z0-9][a-z0-9-]*$`.
-3. `.specify/org/` does not yet exist (otherwise re-run `/speckit.company.charter` and `/speckit.company.hire` instead).
+3. `.specify/org/` does not yet exist (otherwise re-run `/speckit-company.charter` and `/speckit-company.hire` instead).
 
 ## Steps
 
@@ -42,8 +42,8 @@ Also create `.specops/<slug>/queue/` for incoming task specs (will be used at ru
 
 After scaffolding, chain into:
 
-1. `/speckit.company.charter` — fill in business purpose, operating mode, autonomy default, budget.
-2. `/speckit.company.hire ceo` — define the mandatory CEO agent.
+1. `/speckit-company.charter` — fill in business purpose, operating mode, autonomy default, budget.
+2. `/speckit-company.hire ceo` — define the mandatory CEO agent.
 
 The user may interrupt the chain — partial setup is fine. Re-running `init` against an existing slug is an error; the user should run the individual commands instead.
 

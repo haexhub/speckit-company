@@ -40,7 +40,7 @@ For each error code, append a short fix suggestion:
 
 | Code | Fix |
 |---|---|
-| `E_NO_CEO` | Run `/speckit.company.hire ceo` and set `reports_to: null`. |
+| `E_NO_CEO` | Run `/speckit-company.hire ceo` and set `reports_to: null`. |
 | `E_MULTIPLE_ROOTS` | Pick one CEO; set `reports_to:` on the others. |
 | `E_DANGLING_REPORTS_TO` | Either hire the missing role or change the offender's `reports_to`. |
 | `E_CYCLE` | Inspect the listed agents — break the loop by re-parenting one of them. |
@@ -53,5 +53,5 @@ For each error code, append a short fix suggestion:
 
 ## Notes
 
-- Run this before `/speckit.company.start`. The runtime refuses to start a company with errors.
+- Run this before `/speckit-company.start`. The runtime refuses to start a company with errors.
 - The validator is a **pure function over files** — it does not call models or the network. It's safe to run on every file save.

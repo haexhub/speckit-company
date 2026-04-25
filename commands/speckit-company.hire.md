@@ -16,7 +16,7 @@ Expected form: a single role-id (lowercase, hyphenated). Examples: `ceo`, `front
 
 ## Prerequisites
 
-1. `.specify/org/` exists (run `/speckit.company.init` first).
+1. `.specify/org/` exists (run `/speckit-company.init` first).
 2. The role-id matches `^[a-z0-9][a-z0-9-]*$`.
 
 ## Steps
@@ -52,7 +52,7 @@ Run `node <ext>/scripts/validate.mjs .specify/org`. Report findings.
 
 ### Step 6: Re-render org chart
 
-Run `/speckit.company.org-chart` to keep the diagram in sync.
+Run `/speckit-company.org-chart` to keep the diagram in sync.
 
 ## Sensitive Capabilities
 

@@ -19,7 +19,7 @@ Optional flags:
 
 ## Prerequisites
 
-1. `/speckit.company.validate` reports 0 errors.
+1. `/speckit-company.validate` reports 0 errors.
 2. The `hermes` binary is installed and on `$PATH`. If not, abort with installation instructions: <https://hermes-agent.nousresearch.com/docs/>.
 3. The runtime (haex-corp / SpecOps) is reachable. The runtime's API endpoint is read from `.specops/config.json`.
 
@@ -27,7 +27,7 @@ Optional flags:
 
 ### Step 1: Pre-flight
 
-- Run `/speckit.company.validate` — abort on any error.
+- Run `/speckit-company.validate` — abort on any error.
 - Run `which hermes` — abort with help text if missing.
 - Read `.specify/org/constitution.md` to derive `company_id` and `operating_mode`.
 

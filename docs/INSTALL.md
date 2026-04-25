@@ -6,7 +6,7 @@ This guide covers two install paths: **production** (via the spec-kit extension 
 
 - **Node.js ≥ 22** (uses native `node --test` and ESM).
 - **spec-kit ≥ 0.2.0** (for slash-command discovery).
-- **Hermes Agent CLI** in `$PATH` ([hermes-agent.nousresearch.com](https://hermes-agent.nousresearch.com/docs/)) — required only at runtime for `/speckit.company.start`. The spec layer (`init`/`charter`/`hire`/`org-chart`/`validate`) works without Hermes.
+- **Hermes Agent CLI** in `$PATH` ([hermes-agent.nousresearch.com](https://hermes-agent.nousresearch.com/docs/)) — required only at runtime for `/speckit-company.start`. The spec layer (`init`/`charter`/`hire`/`org-chart`/`validate`) works without Hermes.
 - **git** ≥ 2.30 (for worktree-based task isolation).
 
 ## Production install
@@ -53,7 +53,7 @@ specops extension install speckit-company --local
 
 ## Runtime install (Hermes)
 
-For `/speckit.company.start` to work, install Hermes locally per the Nous Research instructions. The runtime expects `hermes chat -q` to be invocable on stdin/stdout.
+For `/speckit-company.start` to work, install Hermes locally per the Nous Research instructions. The runtime expects `hermes chat -q` to be invocable on stdin/stdout.
 
 Verify:
 
@@ -79,7 +79,7 @@ Without these, the MCP server falls back to in-process stubs (useful for develop
 
 ## Troubleshooting
 
-### "hermes: command not found" when calling `/speckit.company.start`
+### "hermes: command not found" when calling `/speckit-company.start`
 
 Hermes isn't on `$PATH`. Install it ([docs](https://hermes-agent.nousresearch.com/docs/)) or pass an explicit path via `.specify/org/company.yml`:
 

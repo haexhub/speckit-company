@@ -68,7 +68,7 @@ Print the path of the created/edited file and a one-line summary. For `remove`, 
 
 ## Notes
 
-- After modifying the catalog, re-run `/speckit.company.validate --catalog <catalog-dir>` against any company that uses these IDs. Existing companies don't auto-revalidate.
+- After modifying the catalog, re-run `/speckit-company.validate --catalog <catalog-dir>` against any company that uses these IDs. Existing companies don't auto-revalidate.
 - `bundled` tag means the entry ships with an extension (e.g. `company-ops` ships with speckit-company). Don't delete bundled entries — they're re-installed by the extension installer.
 - The body of a skill becomes part of every using agent's system prompt. Keep it short and concrete; long skill bodies eat into context budget.
 - This command does not require Hermes to be installed — catalog management is pure file operations.

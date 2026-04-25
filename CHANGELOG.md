@@ -19,7 +19,7 @@ All notable changes to this extension are documented here. Format follows
 
 ### Inkrement 4 — central tool & skill catalog
 
-- New slash command `/speckit.company.catalog` (list, show, add, remove, validate).
+- New slash command `/speckit-company.catalog` (list, show, add, remove, validate).
 - New templates `templates/tool.yml` and `templates/skill.md`.
 - `validate.mjs` accepts `--catalog <dir>` and emits three new error codes: `E_UNKNOWN_TOOL_REFERENCE`, `E_UNKNOWN_SKILL_REFERENCE`, `E_TOOL_CAPABILITY_MISSING`.
 - `extension.yml` registers the new command.

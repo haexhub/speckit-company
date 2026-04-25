@@ -8,13 +8,13 @@ Every "agent" is a separate [Hermes Agent](https://hermes-agent.nousresearch.com
 
 ```bash
 # Inside a spec-kit project:
-/speckit.company.init my-company
-/speckit.company.charter        # purpose, operating_mode, autonomy, budget
-/speckit.company.hire ceo       # mandatory, single point of contact
-/speckit.company.hire engineer  # add as many workers as needed
-/speckit.company.org-chart      # renders mermaid diagram
-/speckit.company.validate       # 0 findings = ready
-/speckit.company.start          # hand over to runtime, queue polling begins
+/speckit-company.init my-company
+/speckit-company.charter        # purpose, operating_mode, autonomy, budget
+/speckit-company.hire ceo       # mandatory, single point of contact
+/speckit-company.hire engineer  # add as many workers as needed
+/speckit-company.org-chart      # renders mermaid diagram
+/speckit-company.validate       # 0 findings = ready
+/speckit-company.start          # hand over to runtime, queue polling begins
 ```
 
 Then queue tasks:

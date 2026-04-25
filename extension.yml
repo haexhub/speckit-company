@@ -22,26 +22,26 @@ requires:
 
 provides:
   commands:
-    - name: speckit.company.init
-      file: commands/speckit.company.init.md
+    - name: speckit-company.init
+      file: commands/speckit-company.init.md
       description: "Bootstrap a new company: scaffold .specify/org/, then chain charter and ceo-hire wizards."
-    - name: speckit.company.charter
-      file: commands/speckit.company.charter.md
+    - name: speckit-company.charter
+      file: commands/speckit-company.charter.md
       description: "Define business purpose, operating_mode, default autonomy, budget, and reporting cadence."
-    - name: speckit.company.hire
-      file: commands/speckit.company.hire.md
+    - name: speckit-company.hire
+      file: commands/speckit-company.hire.md
       description: "Hire (or edit) any agent role. Universal for CEO and workers. Idempotent."
-    - name: speckit.company.org-chart
-      file: commands/speckit.company.org-chart.md
+    - name: speckit-company.org-chart
+      file: commands/speckit-company.org-chart.md
       description: "Render the reports-to graph as a Mermaid diagram into org/org-chart.md."
-    - name: speckit.company.validate
-      file: commands/speckit.company.validate.md
+    - name: speckit-company.validate
+      file: commands/speckit-company.validate.md
       description: "Consistency check: graph (1 root, no cycles, all reports_to exist), tools, models, mode-constraints, budget."
-    - name: speckit.company.start
-      file: commands/speckit.company.start.md
+    - name: speckit-company.start
+      file: commands/speckit-company.start.md
       description: "Hand the company over to the runtime: activate CEO (persistent mode), start queue polling."
-    - name: speckit.company.catalog
-      file: commands/speckit.company.catalog.md
+    - name: speckit-company.catalog
+      file: commands/speckit-company.catalog.md
       description: "Manage the central tool/skill catalog: list, add, remove, show."
 
   config:

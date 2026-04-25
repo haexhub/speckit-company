@@ -164,10 +164,10 @@ The `start` runtime in haex-corp also runs the reference check via `CompanyRunti
 ## Workflow
 
 1. **One-time:** install MCP servers locally (e.g. `uvx mcp-server-github`).
-2. **One-time:** drop a manifest into `catalog/tools/<id>.yml`. Or use `/speckit.company.catalog add tool <id>`.
+2. **One-time:** drop a manifest into `catalog/tools/<id>.yml`. Or use `/speckit-company.catalog add tool <id>`.
 3. **Per agent:** list the tool ID in `agents/<role>.md::tools.mcp`.
-4. **Run** `/speckit.company.validate --catalog <catalog>`. 0 errors = ready.
-5. **Run** `/speckit.company.start`. The runtime hydrates references, sets up Hermes per agent, opens the queue.
+4. **Run** `/speckit-company.validate --catalog <catalog>`. 0 errors = ready.
+5. **Run** `/speckit-company.start`. The runtime hydrates references, sets up Hermes per agent, opens the queue.
 
 Adding a new tool to your repertoire is therefore a single file write + a re-validate. No code changes anywhere else.
 
