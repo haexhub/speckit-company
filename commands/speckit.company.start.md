@@ -51,7 +51,7 @@ The runtime:
 
 1. Loads agent specs via `spec-loader.js`.
 2. Spawns the CEO process (Hermes, `runner_type: persistent`).
-3. Wires the CEO to the `firma-ops` MCP server.
+3. Wires the CEO to the `company-ops` MCP server.
 4. Starts the queue-poller on `.specops/<slug>/queue/`.
 5. Registers a `scheduled` cron entry per agent with `runner_type: scheduled`.
 6. Writes a `company.started` event to the event-store.

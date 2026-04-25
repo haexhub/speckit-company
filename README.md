@@ -47,7 +47,7 @@ reports_to: cto
 skills: [tdd, verification-before-completion]
 tools:
   builtin: [Read, Edit, Bash, Grep]
-  mcp: [github, firma-ops]
+  mcp: [github, company-ops]
 capabilities:                   # default-deny
   - filesystem:write
   - shell:execute
@@ -70,7 +70,7 @@ You are an experienced backend engineer focused on...
 
 ## Documentation
 
-- [docs/INSTALL.md](docs/INSTALL.md) — production + local dev install, Hermes setup, firma-ops env config, troubleshooting.
+- [docs/INSTALL.md](docs/INSTALL.md) — production + local dev install, Hermes setup, company-ops env config, troubleshooting.
 - [docs/concepts.md](docs/concepts.md) — spec hierarchy, operating modes, capability taxonomy, autonomy, worktree isolation, retirement.
 
 ## Requirements
@@ -87,7 +87,7 @@ speckit-company/
 ├── commands/              # slash-command definitions
 ├── templates/             # spec templates (constitution, agent, task)
 ├── scripts/               # validate.mjs, render-org-chart.mjs
-├── mcp-server/firma-ops/  # CEO's runtime tools (dispatch, ask_user, ...)
+├── mcp-server/company-ops/  # CEO's runtime tools (dispatch, ask_user, ...)
 └── tests/                 # node:test specs
 ```
 

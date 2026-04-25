@@ -2,8 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
 
-import { makeHttpContext } from "../mcp-server/firma-ops/http-backend.mjs";
-import { makeHandlers } from "../mcp-server/firma-ops/handlers.mjs";
+import { makeHttpContext } from "../mcp-server/company-ops/http-backend.mjs";
+import { makeHandlers } from "../mcp-server/company-ops/handlers.mjs";
 
 function makeMockServer({ routes }) {
   return new Promise((resolve) => {

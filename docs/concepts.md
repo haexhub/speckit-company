@@ -105,7 +105,7 @@ Three categories live in a single shared catalog at `<haex-corp>/catalog/`. Agen
 
 ```yaml
 tools:
-  mcp: [github, firma-ops]              # → catalog/tools/{github,firma-ops}.yml
+  mcp: [github, company-ops]              # → catalog/tools/{github,company-ops}.yml
   binaries: [python3, gh, jq]           # → catalog/binaries/{python3,gh,jq}.yml
 skills: [tdd, verification-before-completion]   # → catalog/skills/{tdd,...}.md
 ```

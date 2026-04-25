@@ -1,5 +1,5 @@
 /**
- * HTTP-backed implementations of the firma-ops handler context.
+ * HTTP-backed implementations of the company-ops handler context.
  *
  * Targets a haex-corp / SpecOps server (Nuxt under `server/api/...`). The
  * server is expected to expose:
@@ -23,23 +23,23 @@
  *     resp: { content }
  *
  * Configuration via env (read at start time):
- *   FIRMA_OPS_BASE_URL     base URL of the runtime (e.g. http://127.0.0.1:3000)
- *   FIRMA_OPS_PROJECT      project slug
- *   FIRMA_OPS_AUTH_TOKEN   optional bearer token, sent as Authorization header
+ *   COMPANY_OPS_BASE_URL     base URL of the runtime (e.g. http://127.0.0.1:3000)
+ *   COMPANY_OPS_PROJECT      project slug
+ *   COMPANY_OPS_AUTH_TOKEN   optional bearer token, sent as Authorization header
  *
- * If FIRMA_OPS_BASE_URL is not set, makeHandlers() falls back to stubs.
+ * If COMPANY_OPS_BASE_URL is not set, makeHandlers() falls back to stubs.
  */
 
 import { readFile } from "node:fs/promises";
 
 export function httpContextFromEnv() {
-  const baseUrl = process.env.FIRMA_OPS_BASE_URL;
+  const baseUrl = process.env.COMPANY_OPS_BASE_URL;
   if (!baseUrl) return null;
-  const project = process.env.FIRMA_OPS_PROJECT;
+  const project = process.env.COMPANY_OPS_PROJECT;
   if (!project) {
-    throw new Error("FIRMA_OPS_PROJECT must be set when FIRMA_OPS_BASE_URL is set");
+    throw new Error("COMPANY_OPS_PROJECT must be set when COMPANY_OPS_BASE_URL is set");
   }
-  const token = process.env.FIRMA_OPS_AUTH_TOKEN;
+  const token = process.env.COMPANY_OPS_AUTH_TOKEN;
   return makeHttpContext({ baseUrl, project, token });
 }
 

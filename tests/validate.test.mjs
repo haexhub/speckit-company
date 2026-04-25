@@ -71,8 +71,8 @@ async function makeMiniCatalog() {
   await mkdir(path.join(dir, "tools"), { recursive: true });
   await mkdir(path.join(dir, "skills"), { recursive: true });
   await writeFile(
-    path.join(dir, "tools", "firma-ops.yml"),
-    `id: firma-ops
+    path.join(dir, "tools", "company-ops.yml"),
+    `id: company-ops
 type: mcp
 description: "test"
 required_capabilities: [filesystem:read]
@@ -90,7 +90,7 @@ body
   return dir;
 }
 
-test("with --catalog: valid-finite passes (firma-ops + tdd known)", async () => {
+test("with --catalog: valid-finite passes (company-ops + tdd known)", async () => {
   const cat = await makeMiniCatalog();
   try {
     const { findings } = await validateCompany(fixtures("valid-finite"), { catalogDir: cat });
@@ -101,8 +101,8 @@ test("with --catalog: valid-finite passes (firma-ops + tdd known)", async () => 
 });
 
 test("with --catalog: agent referencing unknown tool yields E_UNKNOWN_TOOL_REFERENCE", async () => {
-  // valid-continuous's monitor.md uses no MCP tools, but ceo uses firma-ops.
-  // Build a catalog without firma-ops to force the error.
+  // valid-continuous's monitor.md uses no MCP tools, but ceo uses company-ops.
+  // Build a catalog without company-ops to force the error.
   const dir = await mkdtemp(path.join(os.tmpdir(), "vc-cat-empty-"));
   await mkdir(path.join(dir, "tools"), { recursive: true });
   await mkdir(path.join(dir, "skills"), { recursive: true });
@@ -120,8 +120,8 @@ test("with --catalog: agent missing required tool capability yields E_TOOL_CAPAB
   await mkdir(path.join(dir, "skills"), { recursive: true });
   // Tool that requires a capability the ceo doesn't have
   await writeFile(
-    path.join(dir, "tools", "firma-ops.yml"),
-    `id: firma-ops
+    path.join(dir, "tools", "company-ops.yml"),
+    `id: company-ops
 type: mcp
 description: "test"
 required_capabilities: [payment:execute_unrestricted]
@@ -238,6 +238,123 @@ required_capabilities: [shell:execute]
 `
   );
   const { proj, orgDir } = await makeFixtureWithBinary("python3");
+  try {
+    const { findings } = await validateCompany(orgDir, { catalogDir: cat });
+    assert.deepEqual(errorCodes(findings), []);
+  } finally {
+    await rm(proj, { recursive: true, force: true });
+    await rm(cat, { recursive: true, force: true });
+  }
+});
+
+async function makeFixtureWithToolsAndBinaries(toolList, binaryList, capList) {
+  const proj = await mkdtemp(path.join(os.tmpdir(), "vc-wild-"));
+  const orgDir = path.join(proj, "org");
+  await mkdir(path.join(orgDir, "agents"), { recursive: true });
+  await writeFile(
+    path.join(orgDir, "constitution.md"),
+    `---
+schema_version: "1.0"
+company_id: "wild"
+name: "Wild"
+operating_mode: finite
+default_autonomy: supervised
+budget:
+  max_usd_per_task: 5.00
+  max_usd_per_day: 50.00
+reporting_cadence: on_completion
+---
+
+# Wild
+`
+  );
+  const yamlList = (xs) => `[${xs.map((x) => JSON.stringify(x)).join(", ")}]`;
+  await writeFile(
+    path.join(orgDir, "agents", "ceo.md"),
+    `---
+schema_version: "1.0"
+role: ceo
+model: claude-opus-4-7
+runner: hermes
+runner_type: persistent
+reports_to: null
+skills: []
+tools:
+  builtin: [Read, Bash]
+  mcp: ${yamlList(toolList)}
+  binaries: ${yamlList(binaryList)}
+capabilities: ${yamlList(capList)}
+status: active
+---
+
+# CEO
+`
+  );
+  return { proj, orgDir };
+}
+
+test("with --catalog: wildcard ['*'] in binaries expands and runs capability checks", async () => {
+  const cat = await mkdtemp(path.join(os.tmpdir(), "vc-wild-cat-"));
+  await mkdir(path.join(cat, "tools"), { recursive: true });
+  await mkdir(path.join(cat, "skills"), { recursive: true });
+  await mkdir(path.join(cat, "binaries"), { recursive: true });
+  await writeFile(
+    path.join(cat, "binaries", "python3.yml"),
+    `id: python3
+type: binary
+command: python3
+description: "Python 3"
+required_capabilities: [shell:execute]
+`
+  );
+  await writeFile(
+    path.join(cat, "binaries", "gh.yml"),
+    `id: gh
+type: binary
+command: gh
+description: "GitHub CLI"
+required_capabilities: [shell:execute, account:github]
+`
+  );
+  // Agent grabs all binaries via wildcard but lacks account:github → gh fails.
+  const { proj, orgDir } = await makeFixtureWithToolsAndBinaries([], ["*"], ["shell:execute"]);
+  try {
+    const { findings } = await validateCompany(orgDir, { catalogDir: cat });
+    assert.ok(errorCodes(findings).includes("E_BINARY_CAPABILITY_MISSING"));
+  } finally {
+    await rm(proj, { recursive: true, force: true });
+    await rm(cat, { recursive: true, force: true });
+  }
+});
+
+test("with --catalog: wildcard ['*'] in binaries passes when caps cover all entries", async () => {
+  const cat = await mkdtemp(path.join(os.tmpdir(), "vc-wild-ok-"));
+  await mkdir(path.join(cat, "tools"), { recursive: true });
+  await mkdir(path.join(cat, "skills"), { recursive: true });
+  await mkdir(path.join(cat, "binaries"), { recursive: true });
+  await writeFile(
+    path.join(cat, "binaries", "python3.yml"),
+    `id: python3
+type: binary
+command: python3
+description: "Python 3"
+required_capabilities: [shell:execute]
+`
+  );
+  await writeFile(
+    path.join(cat, "binaries", "git.yml"),
+    `id: git
+type: binary
+command: git
+description: "Git"
+required_capabilities: [shell:execute, filesystem:write]
+`
+  );
+  const { proj, orgDir } = await makeFixtureWithToolsAndBinaries(
+    [],
+    ["*"],
+    ["shell:execute", "filesystem:write", "filesystem:read"]
+  );
   try {
     const { findings } = await validateCompany(orgDir, { catalogDir: cat });
     assert.deepEqual(errorCodes(findings), []);

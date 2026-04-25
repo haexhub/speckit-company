@@ -35,7 +35,7 @@ Prompt, in order:
 - **reports_to**: another role-id, or `null` for the CEO. List existing roles to choose from. Reject self-reference.
 - **skills**: comma-separated list of seed skills (Hermes will accumulate more autonomously).
 - **tools.builtin**: comma-separated subset of Claude-Code-style tools the agent may use.
-- **tools.mcp**: comma-separated names of MCP servers (e.g. `firma-ops`, `github`).
+- **tools.mcp**: comma-separated names of MCP servers (e.g. `company-ops`, `github`).
 - **capabilities**: pick from the known taxonomy. Default-deny: anything not listed is forbidden. Categories: `filesystem`, `shell`, `network`, `code`, `secrets`, `payment`, `account`. See [taxonomy](../templates/agent.md) for sub-tags.
 
 ### Step 3: Status

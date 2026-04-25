@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { TOOL_DEFINITIONS, makeHandlers } from "../mcp-server/firma-ops/handlers.mjs";
+import { TOOL_DEFINITIONS, makeHandlers } from "../mcp-server/company-ops/handlers.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fixtures = (name) => path.join(__dirname, "fixtures", name);

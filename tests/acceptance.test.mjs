@@ -6,7 +6,7 @@
  *   1. Bootstrap a fake spec-kit project layout from templates.
  *   2. Run validate.mjs against the sample org → 0 errors.
  *   3. Run render-org-chart.mjs → produces a Mermaid block.
- *   4. Round-trip the firma-ops MCP handlers (stub backend) for the five tools.
+ *   4. Round-trip the company-ops MCP handlers (stub backend) for the five tools.
  *
  * Hermes binary is NOT required for these tests — they exercise the spec
  * layer + MCP contract only. Live runtime tests live in haex-corp.
@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 
 import { validateCompany } from "../scripts/validate.mjs";
 import { renderOrgChartFromDir } from "../scripts/render-org-chart.mjs";
-import { makeHandlers, TOOL_DEFINITIONS } from "../mcp-server/firma-ops/handlers.mjs";
+import { makeHandlers, TOOL_DEFINITIONS } from "../mcp-server/company-ops/handlers.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.dirname(__dirname);
@@ -54,7 +54,7 @@ reports_to: null
 skills: []
 tools:
   builtin: [Read]
-  mcp: [firma-ops]
+  mcp: [company-ops]
 capabilities:
   - filesystem:read
   - shell:execute
@@ -113,7 +113,7 @@ test("E2E: bootstrap → validate → render → 0 errors", async () => {
   }
 });
 
-test("E2E: firma-ops MCP handlers round-trip the five tools (stub backend)", async () => {
+test("E2E: company-ops MCP handlers round-trip the five tools (stub backend)", async () => {
   const { proj, orgDir } = await bootstrapProject();
   try {
     const handlers = makeHandlers(); // default = stubs

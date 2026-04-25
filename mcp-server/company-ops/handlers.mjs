@@ -1,5 +1,5 @@
 /**
- * Pure tool handlers for the firma-ops MCP server.
+ * Pure tool handlers for the company-ops MCP server.
  *
  * Each handler receives `(args, context)` where context exposes runtime hooks
  * (orchestrator client, artifact reader, user-prompt channel). For Inkrement 1

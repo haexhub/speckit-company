@@ -9,7 +9,7 @@ This decouples *capability deployment* from *agent definition*: when you set up 
 ```
 <haex-corp>/catalog/
 ├── tools/                    MCP servers, custom integrations
-│   ├── firma-ops.yml           (bundled with speckit-company)
+│   ├── company-ops.yml           (bundled with speckit-company)
 │   ├── github.yml
 │   ├── slack.yml
 │   ├── playwright.yml
@@ -101,8 +101,8 @@ lists this skill in its `skills:` array.)
 role: backend-dev
 tools:
   builtin: [Read, Edit, Bash]
-  mcp: [github, firma-ops]              # → catalog/tools/{github,firma-ops}.yml
-  binaries: [git, gh, python3, jq]      # → catalog/binaries/{git,gh,python3,jq}.yml
+  mcp: [github, company-ops]              # → catalog/tools/{github,company-ops}.yml
+  binaries: [git, gh, python3, jq]        # → catalog/binaries/{git,gh,python3,jq}.yml
 skills: [tdd, verification-before-completion]   # → catalog/skills/{tdd,verification-before-completion}.md
 capabilities:
   - filesystem:write
@@ -112,6 +112,26 @@ capabilities:
   - account:github
 ---
 ```
+
+### Wildcards
+
+Use `["*"]` to grant access to **every** entry in a catalog category:
+
+```yaml
+tools:
+  mcp: ["*"]              # all tools in catalog/tools/
+  binaries: ["*"]         # all binaries in catalog/binaries/
+skills: ["*"]             # all skills in catalog/skills/
+```
+
+Wildcard is a **convenience shortcut**, not a permission bypass. The validator and runtime expand `["*"]` to the concrete catalog list and apply the per-entry capability checks normally — so an agent with `binaries: ["*"]` and only `[shell:execute]` granted will still fail validation if any catalog binary requires additional capabilities (e.g. `gh` needs `account:github`).
+
+Mixing literal IDs with `*` (`["python3", "*"]`) is allowed and degenerates to a plain wildcard — the explicit IDs are subsumed by the global expansion.
+
+Use cases:
+- **Sandbox / dev companies** where you trust the agent broadly: `binaries: ["*"]` + a permissive `capabilities` list.
+- **Maintenance agents** that need to pull from any tool: `tools.mcp: ["*"]`.
+- **Knowledge-saturated workers** that should know everything documented: `skills: ["*"]`.
 
 ## Validation rules
 

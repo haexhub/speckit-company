@@ -61,6 +61,12 @@ export async function validateCompany(orgDir, options = {}) {
   return { findings };
 }
 
+function expandWildcards(refs, catalogMap) {
+  if (!Array.isArray(refs) || refs.length === 0) return [];
+  if (refs.includes("*")) return [...catalogMap.keys()];
+  return refs;
+}
+
 async function validateAgainstCatalog(agents, catalogDir, findings) {
   const catalog = await loadCatalogFromDisk(catalogDir);
   for (const agent of agents) {
@@ -71,7 +77,8 @@ async function validateAgainstCatalog(agents, catalogDir, findings) {
       if (g.endsWith(":any")) grantedClasses.add(g.split(":")[0]);
     }
 
-    for (const toolId of agent.tools?.mcp ?? []) {
+    const toolRefs = expandWildcards(agent.tools?.mcp ?? [], catalog.tools);
+    for (const toolId of toolRefs) {
       const tool = catalog.tools.get(toolId);
       if (!tool) {
         findings.push({
@@ -95,7 +102,8 @@ async function validateAgainstCatalog(agents, catalogDir, findings) {
       }
     }
 
-    for (const binId of agent.tools?.binaries ?? []) {
+    const binRefs = expandWildcards(agent.tools?.binaries ?? [], catalog.binaries ?? new Map());
+    for (const binId of binRefs) {
       const bin = catalog.binaries?.get(binId);
       if (!bin) {
         findings.push({
@@ -119,7 +127,8 @@ async function validateAgainstCatalog(agents, catalogDir, findings) {
       }
     }
 
-    for (const skillId of agent.skills ?? []) {
+    const skillRefs = expandWildcards(agent.skills ?? [], catalog.skills);
+    for (const skillId of skillRefs) {
       if (!catalog.skills.has(skillId)) {
         findings.push({
           severity: "error",

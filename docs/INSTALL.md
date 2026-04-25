@@ -64,15 +64,15 @@ echo "say hello" | hermes chat -q
 
 Per-agent profile isolation is automatic — speckit-company sets `HERMES_HOME=<project>/.hermes/<role>/` when spawning each agent's Hermes process. No manual profile management needed.
 
-## firma-ops MCP server config
+## company-ops MCP server config
 
 When running with a live haex-corp runtime, set:
 
 ```bash
-export FIRMA_OPS_BASE_URL="http://127.0.0.1:3000"
-export FIRMA_OPS_PROJECT="my-company"
+export COMPANY_OPS_BASE_URL="http://127.0.0.1:3000"
+export COMPANY_OPS_PROJECT="my-company"
 # optional:
-export FIRMA_OPS_AUTH_TOKEN="..."
+export COMPANY_OPS_AUTH_TOKEN="..."
 ```
 
 Without these, the MCP server falls back to in-process stubs (useful for development).

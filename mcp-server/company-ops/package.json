@@ -1,10 +1,10 @@
 {
-  "name": "firma-ops-mcp-server",
+  "name": "company-ops-mcp-server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "server.mjs",
   "bin": {
-    "firma-ops-mcp": "./server.mjs"
+    "company-ops-mcp": "./server.mjs"
   }
 }
