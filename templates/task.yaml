@@ -1,0 +1,24 @@
+# Task spec: dropped into .specops/<company>/queue/<task-slug>.yaml.
+# The CEO picks it up, decides routing, and orchestrates execution.
+
+schema_version: "1.0"
+goal: ""                          # one-sentence task description
+autonomy: supervised              # full | supervised | interactive (overrides company default)
+approval_gates: []                # optional: [spec, plan, before_execution]
+reporting_cadence: on_completion  # on_completion | hourly | daily
+
+# Lifecycle
+deadline: null                    # ISO-8601 or null
+budget:
+  max_usd: 5.00
+
+# Filesystem isolation
+isolation: worktree               # worktree | shared. Use 'shared' for read-only/research tasks.
+mutates_filesystem: true          # if false, isolation is ignored and 'shared' is used
+
+# Routing
+initial_assignee: ceo             # role-id; the CEO is always a safe default
+
+# Optional context
+inputs: []                        # paths to artifacts the assignee should read first
+expected_outputs: []              # what artifacts the assignee should produce

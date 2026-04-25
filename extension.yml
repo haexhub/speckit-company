@@ -1,0 +1,55 @@
+schema_version: "1.0"
+
+extension:
+  id: speckit-company
+  name: "Company Workflow"
+  version: "0.1.0"
+  description: "Spec-driven multi-agent companies. Define a CEO, hire workers in a reports-to graph, and deploy to a Hermes-backed runtime that pulls tasks from a queue."
+  author: "haex"
+  repository: "https://github.com/haex/speckit-company"
+  license: MIT
+  homepage: "https://github.com/haex/speckit-company"
+
+requires:
+  speckit_version: ">=0.2.0"
+  tools:
+    - name: node
+      required: true
+      version: ">=22"
+    - name: hermes
+      required: false
+      version: ">=0.6"
+
+provides:
+  commands:
+    - name: speckit.company.init
+      file: commands/speckit.company.init.md
+      description: "Bootstrap a new company: scaffold .specify/org/, then chain charter and ceo-hire wizards."
+    - name: speckit.company.charter
+      file: commands/speckit.company.charter.md
+      description: "Define business purpose, operating_mode, default autonomy, budget, and reporting cadence."
+    - name: speckit.company.hire
+      file: commands/speckit.company.hire.md
+      description: "Hire (or edit) any agent role. Universal for CEO and workers. Idempotent."
+    - name: speckit.company.org-chart
+      file: commands/speckit.company.org-chart.md
+      description: "Render the reports-to graph as a Mermaid diagram into org/org-chart.md."
+    - name: speckit.company.validate
+      file: commands/speckit.company.validate.md
+      description: "Consistency check: graph (1 root, no cycles, all reports_to exist), tools, models, mode-constraints, budget."
+    - name: speckit.company.start
+      file: commands/speckit.company.start.md
+      description: "Hand the company over to the runtime: activate CEO (persistent mode), start queue polling."
+
+  config:
+    - name: "company.yml"
+      template: "templates/config.yml"
+      description: "Optional per-company runtime overrides (queue paths, hermes binary)."
+      required: false
+
+tags:
+  - "orchestration"
+  - "multi-agent"
+  - "spec-driven"
+  - "hermes"
+  - "company"

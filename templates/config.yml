@@ -1,0 +1,17 @@
+# Optional per-company runtime overrides. All keys are optional.
+# Drop this file at .specify/org/company.yml inside your spec-kit project.
+
+# Hermes binary location (default: 'hermes' from $PATH).
+hermes_binary: "hermes"
+
+# Where per-agent Hermes profile state lives.
+# Default: <project_root>/.hermes/<role>/
+hermes_home_root: ".hermes"
+
+# Queue directory for incoming tasks.
+# Default: <project_root>/.specops/<company>/queue/
+queue_dir: ".specops/{{company}}/queue"
+
+# Polling interval in milliseconds for the queue (only used when chokidar is
+# unavailable; chokidar event-based watching is preferred).
+queue_poll_interval_ms: 1000

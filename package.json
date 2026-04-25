@@ -1,0 +1,24 @@
+{
+  "name": "speckit-company",
+  "version": "0.1.0",
+  "description": "Spec-driven multi-agent companies for spec-kit. Define a CEO, hire workers, deploy to a Hermes-backed runtime.",
+  "type": "module",
+  "license": "MIT",
+  "author": "haex",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/haex/speckit-company"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate.mjs",
+    "org-chart": "node scripts/render-org-chart.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "yaml": "^2.8.0"
+  }
+}
