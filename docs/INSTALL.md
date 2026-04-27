@@ -25,7 +25,7 @@ This drops the extension into `.specify/extensions/speckit-company/` and exposes
 Clone this repo and register it as a local extension in your haex-corp instance. This is what you want if you're modifying speckit-company itself.
 
 ```bash
-git clone https://github.com/haex/speckit-company.git ~/Projekte/speckit-company
+git clone https://github.com/haexhub/speckit-company.git ~/Projekte/speckit-company
 cd ~/Projekte/speckit-company
 pnpm install
 pnpm test                 # 35 unit + acceptance tests should pass

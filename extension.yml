@@ -6,9 +6,9 @@ extension:
   version: "0.1.0"
   description: "Spec-driven multi-agent companies. Define a CEO, hire workers in a reports-to graph, and deploy to a Hermes-backed runtime that pulls tasks from a queue."
   author: "haex"
-  repository: "https://github.com/haex/speckit-company"
+  repository: "https://github.com/haexhub/speckit-company"
   license: MIT
-  homepage: "https://github.com/haex/speckit-company"
+  homepage: "https://github.com/haexhub/speckit-company"
 
 requires:
   speckit_version: ">=0.2.0"

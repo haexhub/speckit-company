@@ -7,7 +7,7 @@
   "author": "haex",
   "repository": {
     "type": "git",
-    "url": "https://github.com/haex/speckit-company"
+    "url": "https://github.com/haexhub/speckit-company"
   },
   "engines": {
     "node": ">=22"
