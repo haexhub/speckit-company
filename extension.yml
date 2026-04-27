@@ -51,6 +51,7 @@ provides:
       required: false
 
 tags:
+  - "workflow"
   - "orchestration"
   - "multi-agent"
   - "spec-driven"
