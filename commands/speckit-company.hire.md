@@ -21,6 +21,22 @@ Expected form: a single role-id (lowercase, hyphenated). Examples: `ceo`, `front
 
 ## Steps
 
+### Step 0: Load spec (if available)
+
+Check for `.specify/org/specs/<role>.md`. If it exists:
+
+1. Read it and confirm: "Ich habe eine Spec für `<role>` gefunden. Ich verwende sie als Basis."
+2. Pre-fill the wizard fields from the spec:
+   - **Persona body** — synthesize from Purpose, Domain, Operating Principles, and Escalation Logic
+   - **reports_to** — from spec frontmatter or Escalation table
+   - **skills** — from spec Skills section
+   - **env** — credential env vars from Required Infrastructure table
+   - **setup** — infer from infrastructure (e.g. `pip install` for private packages)
+   - **capabilities** — from Required Capabilities table
+3. Present each pre-filled value. Let the user confirm or override before writing.
+
+If no spec exists, run the wizard from scratch (Step 1 onward). Suggest running `/speckit-company.specify-agent <role>` first for new roles.
+
 ### Step 1: Resolve role file
 
 `.specify/org/agents/<role>.md`. If it exists → edit mode (load existing frontmatter as defaults). If not → new mode (load `<ext>/templates/agent.md` as a base).
@@ -37,6 +53,14 @@ Prompt, in order:
 - **tools.builtin**: comma-separated subset of Claude-Code-style tools the agent may use.
 - **tools.mcp**: comma-separated names of MCP servers (e.g. `company-ops`, `github`).
 - **capabilities**: pick from the known taxonomy. Default-deny: anything not listed is forbidden. Categories: `filesystem`, `shell`, `network`, `code`, `secrets`, `payment`, `account`. See [taxonomy](../templates/agent.md) for sub-tags.
+- **env** (required environment variables): Ask explicitly: *"Does this agent need any environment variables, API tokens, or credentials at runtime?"* For each:
+  - `name`: variable name (e.g. `GITHUB_TOKEN`, `OPENAI_API_KEY`, `SERVICE_URL`)
+  - `description`: what it is used for
+  - `secret: true` if it contains credentials/tokens (stored in the runtime vault, never plain text)
+  - `required: true/false`
+  If none needed, write `env: []`.
+- **setup** (one-time initialization): Ask explicitly: *"Does this agent need any software installed or repos cloned before it can run its first task?"* Examples: installing a private Python package, cloning a private repo, setting up a virtualenv. Write as a list of shell commands. Use `${ENV_VAR}` syntax to reference env vars declared above.
+  If none needed, write `setup: []`.
 
 ### Step 3: Status
 

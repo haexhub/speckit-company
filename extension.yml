@@ -28,9 +28,12 @@ provides:
     - name: speckit-company.charter
       file: commands/speckit-company.charter.md
       description: "Define business purpose, operating_mode, default autonomy, budget, and reporting cadence."
+    - name: speckit-company.specify-agent
+      file: commands/speckit-company.specify-agent.md
+      description: "Write a detailed spec for an agent role before hiring. Spec-first agent creation."
     - name: speckit-company.hire
       file: commands/speckit-company.hire.md
-      description: "Hire (or edit) any agent role. Universal for CEO and workers. Idempotent."
+      description: "Hire (or edit) any agent role. Universal for CEO and workers. Idempotent. Reads spec from .specify/org/specs/<role>.md if present."
     - name: speckit-company.org-chart
       file: commands/speckit-company.org-chart.md
       description: "Render the reports-to graph as a Mermaid diagram into org/org-chart.md."

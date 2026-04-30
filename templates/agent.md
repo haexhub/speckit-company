@@ -7,12 +7,25 @@ runner_type: ephemeral        # ephemeral | persistent | scheduled
 reports_to: "{{reports_to}}"  # role-id of supervisor; null for the CEO
 skills:                       # initial seed; Hermes adds more autonomously
   - "{{skill}}"
+nix_packages: []              # nixpkgs attribute names installed into the agent's Docker image
+                              # e.g. [git, python311, nodejs_22, gh, ripgrep]
 tools:
-  builtin: []                 # Read, Edit, Bash, Grep, ...
+  builtin: []                 # Read, Edit, Bash, WebSearch, WebFetch, Grep, ...
   mcp: []                     # references catalog/tools/<id>.yml: github, company-ops, ...
-  binaries: []                # references catalog/binaries/<id>.yml: python3, gh, docker, ...
 capabilities:                 # default-deny: anything not listed is forbidden
   - filesystem:read
+env:                          # environment variables required at runtime (default-deny)
+  # - name: GITHUB_TOKEN
+  #   description: "PAT for cloning/accessing private repos"
+  #   secret: true            # stored in runtime vault — never committed to plain config
+  #   required: true
+  # - name: MY_SERVICE_URL
+  #   description: "Base URL of upstream service"
+  #   secret: false
+  #   required: true
+setup:                        # one-time commands run in the agent container before first dispatch
+  # - "pip install fwbg@git+https://${GITHUB_TOKEN}@github.com/org/fwbg.git"
+  # - "gh repo clone org/private-repo /opt/workspace/private-repo"
 status: active                # active | pending_retire | retired
 ---
 
