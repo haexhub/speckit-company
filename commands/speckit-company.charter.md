@@ -36,6 +36,14 @@ Ask, one at a time, for each of:
   - `max_usd_per_day` (default 50.00)
 - **Reporting Cadence**: `on_completion` (default for `finite`), `hourly`, `daily`, or `weekly`. Mandatory if `operating_mode=continuous`.
 - **Communication Principles** (optional, free text) — global rules that every agent receives as implicit context.
+- **Infrastructure dependencies**: Ask explicitly: *"Does this company depend on any external systems, private repositories, APIs, or databases?"* For each dependency, collect:
+  - `type`: `git_repo` / `api` / `database` / `message_queue` / `other`
+  - `url`: the endpoint or repo URL
+  - `access`: `public` or `private`
+  - If `private`: which agents use it (`used_by`) and what env var provides credentials (`credential_env`)
+  - `purpose`: one sentence describing what it is used for
+  This information is recorded in the constitution frontmatter under `infrastructure:` and is the reference for configuring agent `env` and `setup` fields during the hire step.
+  If none, write `infrastructure: []`.
 
 ### Step 3: Write back
 

@@ -20,7 +20,7 @@ Optional flags:
 ## Prerequisites
 
 1. `/speckit-company.validate` reports 0 errors.
-2. The `hermes` binary is installed and on `$PATH`. If not, abort with installation instructions: <https://hermes-agent.nousresearch.com/docs/>.
+2. `nix` is installed and on `$PATH`. If not, abort: agent images are built with Nix — install it from <https://nixos.org/download/> and ensure `flake.nix` + `flake.lock` exist in the haex-corp project root.
 3. The runtime (haex-corp / SpecOps) is reachable. The runtime's API endpoint is read from `.specops/config.json`.
 
 ## Steps
@@ -28,15 +28,15 @@ Optional flags:
 ### Step 1: Pre-flight
 
 - Run `/speckit-company.validate` — abort on any error.
-- Run `which hermes` — abort with help text if missing.
+- Run `which nix` — abort with installation instructions if missing.
 - Read `.specify/org/constitution.md` to derive `company_id` and `operating_mode`.
 
-### Step 2: Provision per-agent Hermes profiles
+### Step 2: Provision per-agent profiles
 
 For each agent in `.specify/org/agents/<role>.md` with `status: active`:
 
 - Ensure `<project>/.hermes/<role>/` directory exists.
-- The runtime will pass `HERMES_HOME=<project>/.hermes/<role>` when spawning that agent. No further provisioning needed — Hermes initializes the profile lazily on first run.
+- The runtime will pass `HERMES_HOME=<project>/.hermes/<role>` when spawning that agent's container. No further provisioning needed — Hermes initializes the profile lazily on first run inside the container.
 
 ### Step 3: Notify runtime
 

@@ -99,17 +99,6 @@ async function validateAgainstCatalog(agents, catalogDir, findings) {
       }
     }
 
-    const binRefs = expandWildcards(agent.tools?.binaries ?? [], catalog.binaries ?? new Map());
-    for (const binId of binRefs) {
-      if (!catalog.binaries?.get(binId)) {
-        findings.push({
-          severity: "error",
-          code: "E_UNKNOWN_BINARY_REFERENCE",
-          message: `agent '${role}' references unknown binary '${binId}' (not in catalog ${catalogDir})`,
-          location: agent._file,
-        });
-      }
-    }
 
     const skillRefs = expandWildcards(agent.skills ?? [], catalog.skills);
     for (const skillId of skillRefs) {
@@ -128,10 +117,8 @@ async function validateAgainstCatalog(agents, catalogDir, findings) {
 async function loadCatalogFromDisk(catalogDir) {
   const tools = new Map();
   const skills = new Map();
-  const binaries = new Map();
   const toolsDir = path.join(catalogDir, "tools");
   const skillsDir = path.join(catalogDir, "skills");
-  const binariesDir = path.join(catalogDir, "binaries");
   if (await isDirectory(toolsDir)) {
     const files = (await readdir(toolsDir)).filter(
       (f) => f.endsWith(".yml") || f.endsWith(".yaml")
@@ -150,17 +137,7 @@ async function loadCatalogFromDisk(catalogDir) {
       if (fm?.id) skills.set(fm.id, fm);
     }
   }
-  if (await isDirectory(binariesDir)) {
-    const files = (await readdir(binariesDir)).filter(
-      (f) => f.endsWith(".yml") || f.endsWith(".yaml")
-    );
-    for (const file of files) {
-      const raw = await readFile(path.join(binariesDir, file), "utf8");
-      const spec = parseYaml(raw);
-      if (spec?.id) binaries.set(spec.id, spec);
-    }
-  }
-  return { tools, skills, binaries };
+  return { tools, skills };
 }
 
 async function isDirectory(p) {
@@ -298,6 +275,28 @@ function validateAgentFields(agents, constitution, findings) {
         location: agent._file,
       });
     }
+    if (agent.nix_packages != null) {
+      if (!Array.isArray(agent.nix_packages)) {
+        findings.push({
+          severity: "error",
+          code: "E_NIX_PACKAGES_NOT_ARRAY",
+          message: `agent '${role}' has nix_packages but it is not an array`,
+          location: agent._file,
+        });
+      } else {
+        for (const pkg of agent.nix_packages) {
+          if (typeof pkg !== "string" || pkg.trim() === "") {
+            findings.push({
+              severity: "error",
+              code: "E_NIX_PACKAGE_INVALID",
+              message: `agent '${role}' nix_packages contains an invalid entry: ${JSON.stringify(pkg)}`,
+              location: agent._file,
+            });
+          }
+        }
+      }
+    }
+
     const capabilities = agent.capabilities || [];
     for (const cap of capabilities) {
       const cls = capabilityClass(cap);
