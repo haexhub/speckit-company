@@ -35,6 +35,41 @@ Read `.specops/config.json` for `catalog.path`. Default: `<haex-corp>/catalog/`.
 
 ### Step 2: Dispatch on subcommand
 
+**If `$ARGUMENTS` is empty** (no subcommand), run the **Gap Analysis** flow instead of a plain list:
+
+1. Scan all agent specs under `.specify/org/agents/*.md`.
+2. For each agent, extract:
+   - `tools.mcp[]` — each entry is a catalog tool ID
+   - `tools.binaries[]` — each entry is a catalog binary ID
+   - `nix_packages[]` — nixpkgs attribute names (informational; note if missing)
+   - `skills[]` — each entry is a catalog skill ID
+   - `env[]` — env var names (informational)
+3. Cross-reference against the catalog: a declared tool/binary/skill ID is **satisfied** if a matching catalog file exists, otherwise it is a **gap**.
+4. Render a per-agent breakdown:
+
+```
+GAP ANALYSIS — 5 agents scanned
+
+backtest
+  ✓ skills: systematic-debugging, speckit-speckit-company-validate
+  ✗ tools.binaries: docker → not in catalog/binaries/
+  ✗ tools.binaries: git   → not in catalog/binaries/
+  nix_packages: (none declared — consider adding)
+
+dev
+  ✓ skills: test-driven-development, systematic-debugging
+  tools.mcp: (none)
+  tools.binaries: (none)
+  nix_packages: (none declared — consider adding)
+```
+
+5. After the breakdown, offer to:
+   - Walk through each gap and add the missing catalog entry (suggest sensible defaults — e.g. for `docker`: `nix_package: docker`, `command: docker`, `required_capabilities: [shell:execute]`; for `git`: `nix_package: git`, `command: git`)
+   - Skip catalog additions and proceed
+   - Run `validate` to check the existing catalog
+
+The gap analysis **replaces** the plain `list` only when no subcommand is given. When a subcommand is given, proceed as described below.
+
 For `list`, recursively read all `*.yml` and `*.md` files under `tools/`, `skills/`, and `binaries/`, parse frontmatter, render an aligned table:
 
 ```
