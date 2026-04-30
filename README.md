@@ -1,93 +1,111 @@
 # speckit-company
 
-Spec-driven multi-agent companies for [spec-kit](https://github.com/github/spec-kit). Declare a company once — its CEO, its workers, the reports-to graph, capabilities, budgets — and then drop tasks into a queue for the company to execute autonomously.
+Spec-driven multi-agent companies for [spec-kit](https://github.com/github/spec-kit). Define a company's purpose and workflow once, let the AI derive the agent topology, then hand it over to a runtime that pulls tasks from a queue and executes them autonomously.
 
-Every "agent" is a separate [Hermes Agent](https://hermes-agent.nousresearch.com/) profile, so each role accumulates its own memory, skills, and specialization over time.
+Every "agent" is a separate [Hermes Agent](https://hermes-agent.nousresearch.com/) profile — each role accumulates its own memory, skills, and specialization over time. Agents run in per-role Nix-based Docker images built from each agent's `nix_packages` declaration.
 
-## Quickstart
+## Setup workflow
+
+The extension provides an 8-step guided setup:
+
+| Step | Command | What it produces |
+|---|---|---|
+| 1 | `vision` | Purpose, success criteria, scope → `vision.md` |
+| 2 | `roadmap` | Task types, workflow stages, data flows → `roadmap.md` |
+| 3 | `org-design` | AI derives agent topology from roadmap → agents hired |
+| 4 | `governance` | Operating mode, autonomy, budget, reporting → `constitution.md` |
+| 5 | `hire` | Per-agent config: model, `nix_packages`, capabilities, env, setup |
+| 6 | `pipeline` | Ingress sources, egress sinks, quality gates → `pipeline.md` |
+| 7 | `validate` | Consistency + completeness check |
+| 8 | `start` | Hand off to runtime — CEO activates, queue polling begins |
 
 ```bash
-# Inside a spec-kit project:
-/speckit-company.init my-company
-/speckit-company.charter        # purpose, operating_mode, autonomy, budget
-/speckit-company.hire ceo       # mandatory, single point of contact
-/speckit-company.hire engineer  # add as many workers as needed
-/speckit-company.org-chart      # renders mermaid diagram
-/speckit-company.validate       # 0 findings = ready
-/speckit-company.start          # hand over to runtime, queue polling begins
+# Start from inside a spec-kit project:
+/speckit-company.vision     # what does this company exist to do?
 ```
 
-Then queue tasks:
+Vision creates the `.specify/org/` structure on first run — no separate init needed.
+
+After setup, queue tasks:
 
 ```bash
 echo 'goal: "Build login form"' > .specops/my-company/queue/login.yaml
 ```
 
-The CEO picks the task up, dispatches it to the relevant worker via the reports-to graph, interprets the result, iterates.
+The CEO picks the task up, dispatches it through the agent graph, and reports back when done.
 
-## Concepts
-
-### Three spec layers
-
-| Layer | Path | Frequency |
-|---|---|---|
-| **Org-Spec** | `.specify/org/{constitution.md, agents/<role>.md, org-chart.md}` | rarely (org changes) |
-| **Product-Spec** | `.specify/specs/<feature>/{spec.md, plan.md, tasks.md}` | per feature |
-| **Task-Spec** | `.specops/<company>/queue/<task>.yaml` | transient |
-
-### Agent-Spec (immutable after `hire`)
+## Agent spec
 
 ```yaml
 ---
-role: backend-dev
+role: backtest
 model: claude-sonnet-4-6
 runner: hermes
 runner_type: ephemeral          # ephemeral | persistent | scheduled
-reports_to: cto
-skills: [tdd, verification-before-completion]
+reports_to: ceo
+nix_packages: [git, python311, docker]   # installed into agent's Docker image
 tools:
-  builtin: [Read, Edit, Bash, Grep]
-  mcp: [github, company-ops]
+  builtin: [Read, Write, Bash, Grep]
+  mcp: [company-ops]
 capabilities:                   # default-deny
   - filesystem:write
   - shell:execute
-  - network:http
-status: active                  # active | pending_retire | retired
+  - code:execute
+env:
+  - name: GITHUB_TOKEN
+    secret: true
+    required: true
+setup:
+  - "git clone https://github.com/org/repo /tmp/workspace"
+status: active
 ---
-# Persona
+# Persona: Backtest Agent
 
-You are an experienced backend engineer focused on...
+You are a quantitative developer specialised in...
 ```
+
+## Concepts
+
+### Spec layers
+
+| Layer | Path | Changes |
+|---|---|---|
+| **Vision** | `.specify/org/vision.md` | rarely |
+| **Roadmap** | `.specify/org/roadmap.md` | when workflow evolves |
+| **Org** | `.specify/org/{constitution.md, agents/<role>.md}` | when team changes |
+| **Pipeline** | `.specify/org/pipeline.md` | when I/O changes |
+| **Task** | `.specops/<slug>/queue/<task>.yaml` | per task |
 
 ### Capability classes (default-deny)
 
-`filesystem:`, `shell:`, `network:`, `code:`, `secrets:`, `payment:`, `account:`. Sensitive capabilities (`payment:execute_unrestricted`, `account:*`) always require user approval at runtime, regardless of the task's autonomy mode.
+`filesystem:`, `shell:`, `network:`, `code:`, `secrets:`, `payment:`, `account:`.
+
+Sensitive capabilities (`payment:execute_unrestricted`, `account:*`) always require user approval at runtime regardless of the task's autonomy mode.
 
 ### Operating modes
 
-- `finite` — goal-oriented (build a feature → done).
-- `continuous` — control-loop (e.g. trading firm: research → evaluate → deploy → monitor → report → repeat).
+- `finite` — goal-oriented queue, stops when empty.
+- `continuous` — endless control-loop (e.g. a trading firm: research → backtest → analyse → report → repeat).
 
-## Documentation
+### Nix-based agent images
 
-- [docs/INSTALL.md](docs/INSTALL.md) — production + local dev install, Hermes setup, company-ops env config, troubleshooting.
-- [docs/concepts.md](docs/concepts.md) — spec hierarchy, operating modes, capability taxonomy, autonomy, worktree isolation, retirement.
+Each agent declares `nix_packages: [git, python311, ...]` using nixpkg attribute names. The runtime builds a per-agent Docker image from that list at company start. Agents sharing identical packages reuse the same cached image automatically.
 
 ## Requirements
 
-- Node.js 22+
+- Node.js ≥ 22
+- Nix ≥ 2.18 (with flakes enabled)
 - spec-kit ≥ 0.2.0
-- For `start` (runtime): the Hermes Agent CLI installed in `$PATH`.
+- For `start` (runtime): Hermes Agent CLI in `$PATH`
 
 ## Project structure
 
 ```
 speckit-company/
-├── extension.yml          # spec-kit manifest
+├── extension.yml          # spec-kit manifest (8 workflow steps)
 ├── commands/              # slash-command definitions
-├── templates/             # spec templates (constitution, agent, task)
-├── scripts/               # validate.mjs, render-org-chart.mjs
-├── mcp-server/company-ops/  # CEO's runtime tools (dispatch, ask_user, ...)
+├── templates/             # spec templates (constitution, agent, vision, roadmap, pipeline)
+├── scripts/               # validate.mjs
 └── tests/                 # node:test specs
 ```
 
