@@ -19,7 +19,7 @@ Pass `edit` to open the wizard against an existing vision.
 
 ## Prerequisites
 
-1. `.specify/org/` exists (created by `/speckit-company.init`).
+None. If `.specify/org/` does not exist, Vision creates it (including `constitution.md` from the extension template) before proceeding. This makes Vision the effective entry point — `/speckit-company.init` is only needed if you want to bootstrap without immediately starting the wizard.
 
 ## Steps
 
