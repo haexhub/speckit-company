@@ -99,27 +99,6 @@ async function validateAgainstCatalog(agents, catalogDir, findings) {
       }
     }
 
-    if (agent.nix_packages != null) {
-      if (!Array.isArray(agent.nix_packages)) {
-        findings.push({
-          severity: "error",
-          code: "E_NIX_PACKAGES_NOT_ARRAY",
-          message: `agent '${role}' has nix_packages but it is not an array`,
-          location: agent._file,
-        });
-      } else {
-        for (const pkg of agent.nix_packages) {
-          if (typeof pkg !== "string" || pkg.trim() === "") {
-            findings.push({
-              severity: "error",
-              code: "E_NIX_PACKAGE_INVALID",
-              message: `agent '${role}' nix_packages contains an invalid entry: ${JSON.stringify(pkg)}`,
-              location: agent._file,
-            });
-          }
-        }
-      }
-    }
 
     const skillRefs = expandWildcards(agent.skills ?? [], catalog.skills);
     for (const skillId of skillRefs) {
@@ -296,6 +275,28 @@ function validateAgentFields(agents, constitution, findings) {
         location: agent._file,
       });
     }
+    if (agent.nix_packages != null) {
+      if (!Array.isArray(agent.nix_packages)) {
+        findings.push({
+          severity: "error",
+          code: "E_NIX_PACKAGES_NOT_ARRAY",
+          message: `agent '${role}' has nix_packages but it is not an array`,
+          location: agent._file,
+        });
+      } else {
+        for (const pkg of agent.nix_packages) {
+          if (typeof pkg !== "string" || pkg.trim() === "") {
+            findings.push({
+              severity: "error",
+              code: "E_NIX_PACKAGE_INVALID",
+              message: `agent '${role}' nix_packages contains an invalid entry: ${JSON.stringify(pkg)}`,
+              location: agent._file,
+            });
+          }
+        }
+      }
+    }
+
     const capabilities = agent.capabilities || [];
     for (const cap of capabilities) {
       const cls = capabilityClass(cap);

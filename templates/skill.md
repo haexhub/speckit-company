@@ -32,4 +32,4 @@ tags:
 ## References
 
 Load `references/<topic>.md` when you need deeper detail on:
-- `references/[file].md` — [what it covers; load when facing [specific scenario]]
+- `references/[file].md` — [what it covers; load when facing [specific scenario]

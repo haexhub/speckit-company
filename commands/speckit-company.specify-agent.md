@@ -81,11 +81,11 @@ After user approval (or after incorporating feedback):
 2. Write the spec to `.specify/org/specs/<role>.md`.
 3. Set `spec_status: approved` in the frontmatter.
 
-Confirm: "Spec für '<role>' wurde gespeichert unter `.specify/org/specs/<role>.md`."
+Confirm: "Spec for '<role>' was saved to `.specify/org/specs/<role>.md`."
 
 ### Step 6: Offer to hire
 
-Ask: "Soll ich jetzt direkt den Agenten basierend auf dieser Spec anlegen? `/speckit-company.hire <role>`"
+Ask: "Should I create the agent now based on this spec? `/speckit-company.hire <role>`"
 
 If yes → run `/speckit-company.hire <role>`. The hire command will detect and load the spec automatically.
 
@@ -98,4 +98,4 @@ If yes → run `/speckit-company.hire <role>`. The hire command will detect and 
 - The spec is a **requirements document**, not a config. It describes what the agent *should* do; `/speckit-company.hire` translates it into a runnable config (`agent.md`).
 - When re-specifying an existing role: update the spec, set `spec_status: draft`, then re-run hire to re-sync the config.
 - Specs are versioned in git alongside agent configs — they serve as the auditable "why" behind every agent's behavior.
-- For agents that were hired before this command existed, run `specify-agent <role>` to write the spec retroactively from the existing agent.md.
+- For agents that were hired before this command existed, run `/speckit-company.specify-agent <role>` to write the spec retroactively from the existing agent.md.

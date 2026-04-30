@@ -35,7 +35,7 @@ Read `.specops/config.json` for `catalog.path`. Default: `<haex-corp>/catalog/`.
 
 ### Step 2: Dispatch on subcommand
 
-For `list`, recursively read all `*.yml` and `*.md` files under `tools/` and `skills/`, parse frontmatter, render an aligned table:
+For `list`, recursively read all `*.yml` and `*.md` files under `tools/`, `skills/`, and `binaries/`, parse frontmatter, render an aligned table:
 
 ```
 TOOLS

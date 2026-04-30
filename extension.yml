@@ -19,6 +19,9 @@ requires:
     - name: hermes
       required: false
       version: ">=0.6"
+    - name: nix
+      required: true
+      version: ">=2.18"
 
 provides:
   commands:

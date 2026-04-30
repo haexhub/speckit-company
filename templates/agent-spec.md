@@ -23,7 +23,8 @@ created_at: "{{created_at}}"
 Examples:
 - "Dispatched by CEO with a strategy spec JSON from the research agent"
 - "Triggered on a daily schedule with a market data snapshot as input"
-- "Woken by an upstream agent completing its deliverable"]
+- "Woken by an upstream agent completing its deliverable"
+]
 
 ## Deliverables & Outputs
 
@@ -31,7 +32,8 @@ Examples:
 
 Examples:
 - "Backtest report in `.specify/results/<run-id>/report.md` with the standardized metric table"
-- "Updated `strategies/configs/<name>.json` with optimized parameters"]
+- "Updated `strategies/configs/<name>.json` with optimized parameters"
+]
 
 ## Operating Principles
 

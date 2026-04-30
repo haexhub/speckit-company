@@ -25,7 +25,7 @@ Expected form: a single role-id (lowercase, hyphenated). Examples: `ceo`, `front
 
 Check for `.specify/org/specs/<role>.md`. If it exists:
 
-1. Read it and confirm: "Ich habe eine Spec für `<role>` gefunden. Ich verwende sie als Basis."
+1. Read it and confirm: "I found a spec for `<role>`. I'll use it as the baseline."
 2. Pre-fill the wizard fields from the spec:
    - **Persona body** — synthesize from Purpose, Domain, Operating Principles, and Escalation Logic
    - **reports_to** — from spec frontmatter or Escalation table
