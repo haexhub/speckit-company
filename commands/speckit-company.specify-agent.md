@@ -71,6 +71,10 @@ Using the template at `<ext>/templates/agent-spec.md`, populate all sections:
 - **Skills**: list 2–5 domain skill IDs this agent should have on day one
 - **Success Criteria**: 2–3 measurable, observable outcomes
 
+While drafting, cross-reference the catalog for any skills and tools you recommend:
+- If a recommended skill ID exists in `catalog/skills/<id>.md` → mark it `✓`
+- If it doesn't exist yet → mark it `(new — will be created during hire)` so the user knows what to expect
+
 Show the full draft to the user for review before writing.
 
 ### Step 5: Finalize and write

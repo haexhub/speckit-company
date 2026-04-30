@@ -62,6 +62,31 @@ Prompt, in order:
 - **setup** (one-time initialization): Ask explicitly: *"Does this agent need any software installed or repos cloned before it can run its first task?"* Examples: installing a private Python package, cloning a private repo, setting up a virtualenv. Write as a list of shell commands. Use `${ENV_VAR}` syntax to reference env vars declared above.
   If none needed, write `setup: []`.
 
+### Step 2.5: Catalog resolution
+
+After collecting `tools.mcp`, `tools.binaries`, `skills`, and `nix_packages` in Step 2, resolve each declared reference against the catalog before writing the agent file.
+
+**Resolve catalog dir** the same way as `/speckit-company.catalog`: read `.specops/config.json` for `catalog.path`, default `<haex-corp>/catalog/`.
+
+For each declared entry:
+
+| Field | Catalog dir | Catalog file pattern |
+|---|---|---|
+| `tools.mcp[]` | `catalog/tools/` | `<id>.yml` |
+| `tools.binaries[]` | `catalog/binaries/` | `<id>.yml` |
+| `skills[]` | `catalog/skills/` | `<id>.md` |
+
+`nix_packages[]` are nixpkgs attribute names — they are **not** catalog references and do not need resolution here.
+
+For each declared ID that has **no matching catalog file**:
+
+1. Announce: "The <kind> `<id>` is referenced by this agent but has no catalog entry yet."
+2. Ask: "Create a catalog entry for `<id>` now?"
+   - **Yes** → run the inline wizard for that catalog kind (same prompts as `add <kind> <id>` in `/speckit-company.catalog`). Write the file before continuing.
+   - **No / Skip** → note the gap in a warning at the end: "Warning: `<id>` is undeclared in the catalog — run `/speckit-company.catalog add <kind> <id>` later."
+
+If all declared references are satisfied, confirm: "All catalog references resolved."
+
 ### Step 3: Status
 
 Default `status: active`. Offer to set `pending_retire` if the user is draining a role.
