@@ -53,18 +53,6 @@ provides:
       file: commands/speckit-company.start.md
       description: "Step 8: Hand the company over to the runtime: activate CEO, start queue polling."
       is_run: true
-    - name: speckit-company.specify-agent
-      file: commands/speckit-company.specify-agent.md
-      description: "Write a detailed spec for an agent role before hiring. Usable standalone or from org-design."
-      hidden: true
-    - name: speckit-company.org-chart
-      file: commands/speckit-company.org-chart.md
-      description: "Render the reports-to graph as a Mermaid diagram into org/org-chart.md."
-      hidden: true
-    - name: speckit-company.catalog
-      file: commands/speckit-company.catalog.md
-      description: "Manage the tool/skill catalog: list, add, remove, show. Gap-analysis mode when called with no arguments."
-      hidden: true
 
   config:
     - name: "company.yml"

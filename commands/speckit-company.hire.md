@@ -35,7 +35,7 @@ Check for `.specify/org/specs/<role>.md`. If it exists:
    - **capabilities** — from Required Capabilities table
 3. Present each pre-filled value. Let the user confirm or override before writing.
 
-If no spec exists, run the wizard from scratch (Step 1 onward). Suggest running `/speckit-company.specify-agent <role>` first for new roles.
+If no spec exists, run the wizard from scratch (Step 1 onward).
 
 ### Step 1: Resolve role file
 
@@ -99,9 +99,9 @@ Render `.specify/org/agents/<role>.md` with the frontmatter and persona body. Pr
 
 Run `node <ext>/scripts/validate.mjs .specify/org`. Report findings.
 
-### Step 6: Re-render org chart
+### Step 6: Update org chart
 
-Run `/speckit-company.org-chart` to keep the diagram in sync.
+Update `.specify/org/org-chart.md` to reflect the current agents and their `reports_to` relationships.
 
 ## Sensitive Capabilities
 

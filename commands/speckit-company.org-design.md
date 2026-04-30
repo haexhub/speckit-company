@@ -75,9 +75,18 @@ After approval, offer to hire each agent in order (CEO first):
 
 If yes → run `/speckit-company.hire <role>` for each role in topological order (CEO first, then workers in BFS order of the reports-to tree).
 
-### Step 5: Update org chart
+### Step 5: Render org chart
 
-After all hires complete, run `/speckit-company.org-chart` to render the diagram.
+After all hires complete, write `.specify/org/org-chart.md` with a Mermaid `graph TD` diagram derived from the agents' `reports_to` fields:
+
+```mermaid
+graph TD
+  ceo["CEO"]
+  research["Research"] --> ceo
+  backtest["Backtest"] --> ceo
+  analyse["Analysis"] --> ceo
+  dev["Dev"] --> ceo
+```
 
 ## Notes
 
