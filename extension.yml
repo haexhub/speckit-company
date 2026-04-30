@@ -25,10 +25,6 @@ requires:
 
 provides:
   commands:
-    - name: speckit-company.init
-      file: commands/speckit-company.init.md
-      description: "Bootstrap a new company: scaffold .specify/org/, then chain the 8-step setup workflow."
-      hidden: true
     - name: speckit-company.vision
       file: commands/speckit-company.vision.md
       description: "Step 1: Define the company's purpose, success criteria, and scope."
