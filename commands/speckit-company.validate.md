@@ -34,7 +34,21 @@ Group findings by severity (errors, warnings, info). For each finding:
 
 If 0 findings: print `✓ Validation passed: 0 findings.` and exit 0.
 
-### Step 3: Suggest fixes
+### Step 3: Check setup completeness
+
+Beyond the validator, check whether the setup workflow has been completed:
+
+| File | Status | Action if missing |
+|---|---|---|
+| `.specify/org/vision.md` | required | Run `/speckit-company.vision` |
+| `.specify/org/roadmap.md` | required | Run `/speckit-company.roadmap` |
+| `.specify/org/pipeline.md` | required | Run `/speckit-company.pipeline` |
+| `.specify/org/constitution.md` | required (validator checks) | Run `/speckit-company.init` |
+| `.specify/org/agents/ceo.md` | required (validator checks) | Run `/speckit-company.hire ceo` |
+
+Report missing files as warnings (not errors — the validator handles hard errors).
+
+### Step 4: Suggest fixes
 
 For each error code, append a short fix suggestion:
 

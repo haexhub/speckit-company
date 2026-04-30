@@ -51,6 +51,7 @@ Prompt, in order:
 - **reports_to**: another role-id, or `null` for the CEO. List existing roles to choose from. Reject self-reference.
 - **skills**: comma-separated list of seed skills (Hermes will accumulate more autonomously).
 - **tools.builtin**: comma-separated subset of Claude-Code-style tools the agent may use.
+- **nix_packages**: space-separated list of nixpkgs attribute names that will be installed into this agent's Docker image. Examples: `git python311 nodejs_22 gh ripgrep`. If unsure of the package name, suggest searching https://search.nixos.org/packages. Leave empty if the agent only uses built-in tools.
 - **tools.mcp**: comma-separated names of MCP servers (e.g. `company-ops`, `github`).
 - **capabilities**: pick from the known taxonomy. Default-deny: anything not listed is forbidden. Categories: `filesystem`, `shell`, `network`, `code`, `secrets`, `payment`, `account`. See [taxonomy](../templates/agent.md) for sub-tags.
 - **env** (required environment variables): Ask explicitly: *"Does this agent need any environment variables, API tokens, or credentials at runtime?"* For each:
@@ -73,10 +74,9 @@ For each declared entry:
 | Field | Catalog dir | Catalog file pattern |
 |---|---|---|
 | `tools.mcp[]` | `catalog/tools/` | `<id>.yml` |
-| `tools.binaries[]` | `catalog/binaries/` | `<id>.yml` |
 | `skills[]` | `catalog/skills/` | `<id>.md` |
 
-`nix_packages[]` are nixpkgs attribute names — they are **not** catalog references and do not need resolution here.
+`nix_packages[]` are nixpkgs attribute names — they are **not** catalog references and do not need resolution here. `tools.binaries` is deprecated — use `nix_packages` instead.
 
 For each declared ID that has **no matching catalog file**:
 

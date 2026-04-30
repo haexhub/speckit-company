@@ -40,12 +40,26 @@ Also create `.specops/<slug>/queue/` for incoming task specs (will be used at ru
 
 ### Step 3: Chain wizards
 
-After scaffolding, chain into:
+After scaffolding, announce the 8-step setup workflow and offer to proceed step by step:
 
-1. `/speckit-company.charter` — fill in business purpose, operating mode, autonomy default, budget.
-2. `/speckit-company.hire ceo` — define the mandatory CEO agent.
+```
+Company scaffolded. Setup workflow:
 
-The user may interrupt the chain — partial setup is fine. Re-running `init` against an existing slug is an error; the user should run the individual commands instead.
+  1. Vision      — purpose, success criteria, scope
+  2. Roadmap     — task types, workflow paths, data flows
+  3. Org Design  — AI derives agent topology from roadmap
+  4. Governance  — operating mode, autonomy, budget, reporting
+  5. Hire        — configure each agent (model, nix_packages, env, setup)
+  6. Pipeline    — ingress sources, egress sinks, quality gates
+  7. Validate    — full consistency check
+  8. Execute     — hand off to runtime
+
+Shall I start with Step 1 (Vision)?
+```
+
+Chain immediately into `/speckit-company.vision` if the user agrees.
+
+The user may stop at any point — partial setup is fine. Re-running `init` against an existing slug is an error; run the individual commands instead.
 
 ## Notes
 

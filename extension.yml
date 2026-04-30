@@ -27,28 +27,43 @@ provides:
   commands:
     - name: speckit-company.init
       file: commands/speckit-company.init.md
-      description: "Bootstrap a new company: scaffold .specify/org/, then chain charter and ceo-hire wizards."
-    - name: speckit-company.charter
-      file: commands/speckit-company.charter.md
-      description: "Define business purpose, operating_mode, default autonomy, budget, and reporting cadence."
-    - name: speckit-company.specify-agent
-      file: commands/speckit-company.specify-agent.md
-      description: "Write a detailed spec for an agent role before hiring. Spec-first agent creation."
+      description: "Bootstrap a new company: scaffold .specify/org/, then chain the 8-step setup workflow."
+    - name: speckit-company.vision
+      file: commands/speckit-company.vision.md
+      description: "Step 1: Define the company's purpose, success criteria, and scope."
+    - name: speckit-company.roadmap
+      file: commands/speckit-company.roadmap.md
+      description: "Step 2: Define task types, workflow stages, and data flows."
+    - name: speckit-company.org-design
+      file: commands/speckit-company.org-design.md
+      description: "Step 3: AI derives agent topology from the roadmap. Propose roles, reports-to, interfaces."
+    - name: speckit-company.governance
+      file: commands/speckit-company.governance.md
+      description: "Step 4: Configure operating mode, autonomy, budget, and reporting cadence."
     - name: speckit-company.hire
       file: commands/speckit-company.hire.md
-      description: "Hire (or edit) any agent role. Universal for CEO and workers. Idempotent. Reads spec from .specify/org/specs/<role>.md if present."
+      description: "Step 5: Hire (or edit) any agent role. Idempotent. Reads spec from .specify/org/specs/<role>.md if present."
+    - name: speckit-company.pipeline
+      file: commands/speckit-company.pipeline.md
+      description: "Step 6: Define ingress sources, egress sinks, and quality gates."
+    - name: speckit-company.validate
+      file: commands/speckit-company.validate.md
+      description: "Step 7: Full consistency check — graph integrity, tools, models, mode-constraints, setup completeness."
+    - name: speckit-company.start
+      file: commands/speckit-company.start.md
+      description: "Step 8: Hand the company over to the runtime: activate CEO, start queue polling."
+    - name: speckit-company.specify-agent
+      file: commands/speckit-company.specify-agent.md
+      description: "Write a detailed spec for an agent role before hiring. Usable standalone or from org-design."
     - name: speckit-company.org-chart
       file: commands/speckit-company.org-chart.md
       description: "Render the reports-to graph as a Mermaid diagram into org/org-chart.md."
-    - name: speckit-company.validate
-      file: commands/speckit-company.validate.md
-      description: "Consistency check: graph (1 root, no cycles, all reports_to exist), tools, models, mode-constraints, budget."
-    - name: speckit-company.start
-      file: commands/speckit-company.start.md
-      description: "Hand the company over to the runtime: activate CEO (persistent mode), start queue polling."
     - name: speckit-company.catalog
       file: commands/speckit-company.catalog.md
-      description: "Manage the central tool/skill catalog: list, add, remove, show."
+      description: "Manage the tool/skill catalog: list, add, remove, show. Gap-analysis mode when called with no arguments."
+    - name: speckit-company.charter
+      file: commands/speckit-company.charter.md
+      description: "Deprecated — use speckit-company.governance instead."
 
   config:
     - name: "company.yml"

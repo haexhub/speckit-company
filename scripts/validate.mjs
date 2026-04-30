@@ -280,7 +280,7 @@ function validateAgentFields(agents, constitution, findings) {
         findings.push({
           severity: "error",
           code: "E_NIX_PACKAGES_NOT_ARRAY",
-          message: `agent '${role}' has nix_packages but it is not an array`,
+          message: `agent '${agent.role}' has nix_packages but it is not an array`,
           location: agent._file,
         });
       } else {
@@ -289,7 +289,7 @@ function validateAgentFields(agents, constitution, findings) {
             findings.push({
               severity: "error",
               code: "E_NIX_PACKAGE_INVALID",
-              message: `agent '${role}' nix_packages contains an invalid entry: ${JSON.stringify(pkg)}`,
+              message: `agent '${agent.role}' nix_packages contains an invalid entry: ${JSON.stringify(pkg)}`,
               location: agent._file,
             });
           }

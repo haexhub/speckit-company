@@ -20,11 +20,10 @@ infrastructure:                   # external systems this company depends on
 
 # Company Constitution: {{name}}
 
-## Business Purpose
-
-> Replace this section with one paragraph describing what this company does and
-> why it exists. Be specific. The CEO will read this on every task to anchor
-> its judgement.
+> **Business purpose and success criteria** are defined in `.specify/org/vision.md`.
+> **Task types and workflow paths** are defined in `.specify/org/roadmap.md`.
+> **Ingress, egress, and quality gates** are defined in `.specify/org/pipeline.md`.
+> This file governs operational parameters only.
 
 ## Operating Mode
 
@@ -57,11 +56,6 @@ suspends new dispatches until the next UTC day.
 
 ## Infrastructure Requirements
 
-> List all external systems, repos, APIs, or services the company depends on.
-> For each, document: what it is, which agents use it, how access is granted
-> (env var / MCP / public API), and what happens if it is unavailable.
->
-> Example:
-> - **fwbg Framework** (git_repo, private): Used by `backtest-agent` to run
->   backtests. Installed via `pip install git+https://${GITHUB_TOKEN}@github.com/org/fwbg.git`.
->   Required env: `GITHUB_TOKEN`. Unavailability: backtest tasks fail with setup error.
+> List external systems, repos, APIs, or services the company depends on.
+> For each: what it is, which agents use it, how access is granted (credential env var),
+> and what happens if it is unavailable. This is the reference for agent `env:` and `setup:` fields.
